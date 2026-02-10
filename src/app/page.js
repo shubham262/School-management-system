@@ -1,9 +1,9 @@
 import { UserLock, UserPen, UserStar } from "lucide-react";
 import Image from "next/image";
-export default function Home() {
+const Home = () => {
 	return (
-		<div className="flex min-h-screen h-screen min-w-screen bg-[#f3f2fe] overflow-x-hidden overflow-y-auto">
-			<div className="flex-1 flex self-stretch">
+		<div className="flex  flex-col min-h-screen h-screen min-w-screen bg-[#f3f2fe] overflow-x-hidden overflow-y-auto md:flex-row">
+			<div className="flex-1 max-h-75 flex self-stretch md:max-h-[unset]">
 				<Image
 					src={"/landing.png"}
 					alt="landing.png"
@@ -16,7 +16,7 @@ export default function Home() {
 					}}
 				/>
 			</div>
-			<div className="flex-1 flex self-stretch flex-col gap-12 p-12 ">
+			<div className="flex-1 flex self-stretch flex-col gap-12  p-4 md:p-12 ">
 				<span className="text-[32px] text-[#111] font-bold">
 					Transforming Education:School Management System
 				</span>
@@ -25,8 +25,8 @@ export default function Home() {
 					operations, enhance learning, and foster seamless communication for
 					students, teachers, and administrators.
 				</span>
-				<div className="flex flex-col gap-[20px] self-stretch">
-					<div className="flex flex-col gap-[12px] self-stretch">
+				<div className="flex flex-col gap-5 self-stretch">
+					<div className="flex flex-col gap-3 self-stretch">
 						<UserPen size={45} color="#2e4df2" />
 						<span className="text-[24px] text-[#111] font-bold">
 							For Students
@@ -35,7 +35,7 @@ export default function Home() {
 							Empowering academic journey
 						</span>
 					</div>
-					<div className="flex flex-col gap-[12px] self-stretch">
+					<div className="flex flex-col gap-3 self-stretch">
 						<UserLock size={45} color="#2e4df2" />
 
 						<span className="text-[24px] text-[#111] font-bold">
@@ -45,7 +45,7 @@ export default function Home() {
 							Simplifying daily tasks
 						</span>
 					</div>
-					<div className="flex flex-col gap-[12px] self-stretch">
+					<div className="flex flex-col gap-3 self-stretch">
 						<UserStar size={45} color="#2e4df2" />
 
 						<span className="text-[24px] text-[#111] font-bold">
@@ -66,4 +66,6 @@ export default function Home() {
 			</div>
 		</div>
 	);
-}
+};
+
+export default Home;
