@@ -1,8 +1,8 @@
+import { UserLock, UserPen, UserStar } from "lucide-react";
 import Image from "next/image";
-
 export default function Home() {
 	return (
-		<div className="flex min-h-screen min-w-screen bg-white">
+		<div className="flex min-h-screen h-screen min-w-screen bg-[#f3f2fe] overflow-x-hidden overflow-y-auto">
 			<div className="flex-1 flex self-stretch">
 				<Image
 					src={"/landing.png"}
@@ -16,7 +16,54 @@ export default function Home() {
 					}}
 				/>
 			</div>
-			<div className="flex-1 flex self-stretch bg-[red]"></div>
+			<div className="flex-1 flex self-stretch flex-col gap-12 p-12 ">
+				<span className="text-[32px] text-[#111] font-bold">
+					Transforming Education:School Management System
+				</span>
+				<span className="text-[24px] text-[#00002e]">
+					Discover our innovative platform designed to streamline school
+					operations, enhance learning, and foster seamless communication for
+					students, teachers, and administrators.
+				</span>
+				<div className="flex flex-col gap-[20px] self-stretch">
+					<div className="flex flex-col gap-[12px] self-stretch">
+						<UserPen size={45} color="#2e4df2" />
+						<span className="text-[24px] text-[#111] font-bold">
+							For Students
+						</span>
+						<span className="text-[#00002e] text-[16px]">
+							Empowering academic journey
+						</span>
+					</div>
+					<div className="flex flex-col gap-[12px] self-stretch">
+						<UserLock size={45} color="#2e4df2" />
+
+						<span className="text-[24px] text-[#111] font-bold">
+							For Teachers
+						</span>
+						<span className="text-[#00002e] text-[16px]">
+							Simplifying daily tasks
+						</span>
+					</div>
+					<div className="flex flex-col gap-[12px] self-stretch">
+						<UserStar size={45} color="#2e4df2" />
+
+						<span className="text-[24px] text-[#111] font-bold">
+							For Administration
+						</span>
+						<span className="text-[#00002e] text-[16px]">
+							Optimising school management
+						</span>
+					</div>
+				</div>
+
+				<button className="mt-auto bg-[#223edd] px-8 py-3 rounded-2xl cursor-pointer text-white text-[16px] font-bold hover:-translate-y-0.75 transition-all duration-300 ease-in-out">
+					Get Started
+				</button>
+				<span className="text-center text-[16px] text-[#6b7280]">
+					Register your school and start evolving education.
+				</span>
+			</div>
 		</div>
 	);
 }
