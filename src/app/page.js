@@ -1,8 +1,15 @@
 import { UserLock, UserPen, UserStar } from "lucide-react";
 import Image from "next/image";
+
+export const metadata = {
+	title: "School Management System | Transforming education",
+	description:
+		"Streamlining operations,enhance learning and improving communication for students, teachers and admins.",
+};
+
 const Home = () => {
 	return (
-		<div className="flex  flex-col min-h-screen h-screen min-w-screen bg-[#f3f2fe] overflow-x-hidden overflow-y-auto md:flex-row">
+		<div className="flex  flex-col min-h-screen h-screen min-w-screen bg-[#f3f2fe] overflow-x-hidden overflow-y-auto  md:flex-row md:overflow-hidden ">
 			<div className="flex-1 max-h-75 flex self-stretch md:max-h-[unset]">
 				<Image
 					src={"/landing.png"}
@@ -16,7 +23,7 @@ const Home = () => {
 					}}
 				/>
 			</div>
-			<div className="flex-1 flex self-stretch flex-col gap-12  p-4 md:p-12 ">
+			<div className="flex-1 flex self-stretch flex-col gap-12  p-4 md:p-12  md:overflow-y-auto">
 				<span className="text-[32px] text-[#111] font-bold">
 					Transforming Education:School Management System
 				</span>
