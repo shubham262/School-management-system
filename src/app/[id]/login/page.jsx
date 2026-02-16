@@ -1,14 +1,14 @@
-import Register from "@/views/auth/Register";
+import Login from "@/views/auth/Login";
 import React, { memo } from "react";
 
 export const metadata = {
-	title: "Register your school",
+	title: "Login to your school",
 	description:
 		"Streamlining operations,enhance learning and improving communication for students, teachers and admins.",
 };
 
-const AuthRegister = () => {
-	return <Register />;
+const AuthLogin = () => {
+	return <Login />;
 };
 
-export default memo(AuthRegister);
+export default memo(AuthLogin);
