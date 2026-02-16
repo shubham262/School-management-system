@@ -2,10 +2,10 @@ import { MoveLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { memo } from "react";
-
+import { FcGoogle } from "react-icons/fc";
 const Register = () => {
 	return (
-		<div className="w-screen h-screen min-h-screen bg-slate-100 flex justify-center items-center p-4">
+		<div className="w-screen h-screen min-h-screen bg-slate-100 flex justify-center items-center p-4 overflow-y-auto">
 			<div className="w-full max-w-md rounded-2xl overflow-hidden bg-white">
 				<div className="w-full h-40">
 					<Image
@@ -24,23 +24,46 @@ const Register = () => {
 						<MoveLeft />
 						Back
 					</Link>
-					<h1>Register</h1>
-					<button>Register with Google</button>
+					<h1 className="mt-4 font-semibold text-2xl text-slate-900">
+						Register
+					</h1>
+					<button className="w-full cursor-pointer border border-slate-300 rounded-lg px-4 py-2.5 text-sm text-slate-700 font-bold flex item-center gap-3 justify-center hover:bg-slate-50 mt-5">
+						<span className="mt-[3px]">
+							<FcGoogle />
+						</span>
+						Register with Google
+					</button>
 
-					<div>or</div>
+					<div className="my-5 text-center text-slate-500">or</div>
 					<div className="flex flex-col">
-						<label>Email</label>
-						<input type="email" placeholder="Enter Your email" />
+						<label className="text-sm mb-1 text-slate-700">Email</label>
+						<input
+							type="email"
+							placeholder="Enter Your email"
+							className="w-full rounded-lg outline-none  border border-slate-300 px-3 py-2  text-sm focus:border-slate-500 mb-5"
+						/>
 					</div>
 					<div className="flex flex-col">
-						<label>Password</label>
-						<input type="password" placeholder="Enter Your Password" />
+						<label className="text-sm mb-1 text-slate-700">Password</label>
+						<input
+							type="password"
+							placeholder="Enter Your Password"
+							className="w-full rounded-lg outline-none  border border-slate-300 px-3 py-2  text-sm focus:border-slate-500 mb-5"
+						/>
 					</div>
 					<div className="flex flex-col">
-						<label>Confirm Password</label>
-						<input type="password" placeholder="Confirm Password" />
+						<label className="text-sm mb-1 text-slate-700">
+							Confirm Password
+						</label>
+						<input
+							type="password"
+							placeholder="Confirm Password"
+							className="w-full rounded-lg outline-none  border border-slate-300 px-3 py-2  text-sm focus:border-slate-500 mb-5"
+						/>
 					</div>
-					<button>Register</button>
+					<button className="w-full rounded-lg bg-blue-600 px-4 py-2.5 cursor-pointer text-sm text-white font-medium hover:bg-blue-700">
+						Register
+					</button>
 				</div>
 			</div>
 		</div>
