@@ -7,7 +7,7 @@ import { FcGoogle } from "react-icons/fc";
 const Register = () => {
 	return (
 		<div className="w-screen  min-h-screen bg-slate-100 flex justify-center items-center p-4 overflow-y-auto">
-			<div className="w-full max-w-md rounded-2xl overflow-hidden bg-white">
+			<div className="w-full max-w-md rounded-2xl overflow-hidden bg-white shadow-md">
 				<div className="w-full h-40">
 					<Image
 						src={"/banner.png"}
