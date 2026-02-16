@@ -1,7 +1,9 @@
+"use client";
+import { message } from "antd";
 import { MoveLeft, Upload } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useCallback, useState } from "react";
 
 const availableClasses = [
 	"Nursery",
@@ -22,6 +24,41 @@ const availableClasses = [
 ];
 
 const SchoolInformation = () => {
+	const [info, setInfo] = useState({
+		schoolName: "",
+		location: "",
+		classes: [],
+		logo: null,
+	});
+
+	const handleSelectClasses = useCallback(
+		(e, className) => {
+			e?.preventDefault();
+			const existingClasses = [...(info?.classes || [])];
+			const index = existingClasses?.indexOf(className);
+
+			if (index === -1) {
+				existingClasses.push(className);
+			} else {
+				existingClasses.splice(index, 1);
+			}
+			setInfo((prev) => ({ ...prev, classes: existingClasses }));
+		},
+		[info?.classes]
+	);
+
+	const handleImageUpload = useCallback((event) => {
+		const file = event?.target?.files?.[0];
+		if (file) {
+			const fileSize = file?.size;
+			if (fileSize > 5 * 1024 * 1024) {
+				return message.error("File size is exceeding 5MB");
+			}
+
+			setInfo((prev) => ({ ...prev, logo: file }));
+		}
+	}, []);
+
 	return (
 		<div className="w-screen  min-h-screen bg-slate-100 flex justify-center items-center p-4 overflow-y-auto">
 			<div className="w-full max-w-2xl rounded-2xl overflow-hidden bg-white shadow-md">
@@ -46,6 +83,10 @@ const SchoolInformation = () => {
 								School Name <span className="text-red-500">*</span>
 							</label>
 							<input
+								value={info?.schoolName}
+								onChange={(e) =>
+									setInfo((prev) => ({ ...prev, schoolName: e?.target?.value }))
+								}
 								type="text"
 								placeholder="Enter Your School Name"
 								className="w-full rounded-lg outline-none  border border-slate-300 px-3 py-2  text-sm focus:border-slate-500"
@@ -57,6 +98,10 @@ const SchoolInformation = () => {
 								Location / Address <span className="text-red-500">*</span>
 							</label>
 							<textarea
+								value={info?.location}
+								onChange={(e) =>
+									setInfo((prev) => ({ ...prev, location: e?.target?.value }))
+								}
 								rows={3}
 								type="text"
 								placeholder="Enter Your School Name"
@@ -75,13 +120,17 @@ const SchoolInformation = () => {
 							<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
 								{availableClasses?.map((className, index) => (
 									<button
-										className="cursor-pointer px-3 py-2 rounded-lg text-xs font-medium border transition-all 
-                                         bg-white text-slate-700 border-slate-500
-                                        "
+										className={`cursor-pointer px-3 py-2 rounded-lg text-xs font-medium border transition-all 
+                                        
+                                         ${
+																						info?.classes?.includes(className)
+																							? "bg-blue-500 text-white border-blue-600"
+																							: " bg-white text-slate-700 border-slate-500"
+																					}
+                                        `}
 										key={`${index}-${className}`}
+										onClick={(e) => handleSelectClasses(e, className)}
 									>
-										{/* bg-blue-500 text-white border-blue-600 */}
-
 										{className}
 									</button>
 								))}
@@ -105,7 +154,12 @@ const SchoolInformation = () => {
 								<p className="text-xs text-slate-600 mt-1">
 									Max of 5 MB (PNG or JPG)
 								</p>
-								<input type="file" accept="image/*" className="hidden" />
+								<input
+									type="file"
+									accept="image/*"
+									className="hidden"
+									onChange={handleImageUpload}
+								/>
 							</label>
 						</div>
 					</form>
