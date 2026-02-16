@@ -1,6 +1,8 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { message } from "antd";
-import { MoveLeft, Upload } from "lucide-react";
+import { MoveLeft, Upload, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useCallback, useState } from "react";
@@ -29,6 +31,7 @@ const SchoolInformation = () => {
 		location: "",
 		classes: [],
 		logo: null,
+		logoPreview: null,
 	});
 
 	const handleSelectClasses = useCallback(
@@ -56,7 +59,18 @@ const SchoolInformation = () => {
 			}
 
 			setInfo((prev) => ({ ...prev, logo: file }));
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				console.log("reader result", reader.result);
+				setInfo((prev) => ({ ...prev, logoPreview: reader.result }));
+			};
+			reader.readAsDataURL(file);
 		}
+	}, []);
+
+	const handleRemoveImage = useCallback((e) => {
+		e?.preventDefault();
+		setInfo((prev) => ({ ...prev, logoPreview: null, logo: null }));
 	}, []);
 
 	return (
@@ -146,25 +160,50 @@ const SchoolInformation = () => {
 								MB)
 							</p>
 
-							<label className="cursor-pointer w-full border-2 border-dashed border-slate-300 rounded-lg p-8 flex flex-col items-center justify-center transition-all hover:border-slate-400">
-								<Upload />
-								<p className="text-sm text-slate-600 font-medium mt-2">
-									Click to upload logo
-								</p>
-								<p className="text-xs text-slate-600 mt-1">
-									Max of 5 MB (PNG or JPG)
-								</p>
-								<input
-									type="file"
-									accept="image/*"
-									className="hidden"
-									onChange={handleImageUpload}
-								/>
-							</label>
+							{!info?.logo ? (
+								<label className="cursor-pointer w-full border-2 border-dashed border-slate-300 rounded-lg p-8 flex flex-col items-center justify-center transition-all hover:border-slate-400">
+									<Upload />
+									<p className="text-sm text-slate-600 font-medium mt-2">
+										Click to upload logo
+									</p>
+									<p className="text-xs text-slate-600 mt-1">
+										Max of 5 MB (PNG or JPG)
+									</p>
+									<input
+										type="file"
+										accept="image/*"
+										className="hidden"
+										onChange={handleImageUpload}
+									/>
+								</label>
+							) : (
+								<div className="relative cursor-pointer w-full border-2 border-slate-300 rounded-lg p-8 flex items-center gap-4">
+									<div className="w-20 h-20 rounded-lg overflow-hidden border border-slate-300">
+										<img
+											src={info?.logoPreview}
+											className="w-full h-full object-contain"
+										/>
+									</div>
+									<div className="flex-1 flex-col">
+										<p className="text-sm text-slate-700 font-medium">
+											{info?.logo?.name}
+										</p>
+										<p className="text-xs text-slate-500">
+											{(info?.logo?.size / (1024 * 1024)).toFixed(2)} MB
+										</p>
+									</div>
+									<button className="cursor-pointer ">
+										<X />
+									</button>
+								</div>
+							)}
 						</div>
 					</form>
 
-					<button className="w-full rounded-lg bg-blue-600 px-4 py-2.5 cursor-pointer text-sm text-white font-medium hover:bg-blue-700">
+					<button
+						onClick={handleRemoveImage}
+						className="w-full rounded-lg bg-blue-600 px-4 py-2.5 cursor-pointer text-sm text-white font-medium hover:bg-blue-700"
+					>
 						Complete Setup
 					</button>
 				</div>
