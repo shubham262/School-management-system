@@ -13,6 +13,45 @@ import {
 } from "lucide-react";
 import React, { memo } from "react";
 
+// const ANNOUNCEMENTS = [
+// 	{
+// 		id: 1,
+// 		tag: "Exam",
+
+// 		date: "Feb 17, 2026",
+// 		title: "Annual Examination Schedule Released",
+// 		description:
+// 			"The annual exam timetable for Classes 1–12 has been published. Students are advised to check the notice board and school portal for complete details and subject-wise timings.",
+// 	},
+// 	{
+// 		id: 2,
+// 		tag: "Holiday",
+
+// 		date: "Feb 14, 2026",
+// 		title: "School Closed on Feb 19 – Founders' Day",
+// 		description:
+// 			"In celebration of Founders' Day, the school will remain closed on Wednesday, 19th February 2026. Regular classes resume from Thursday, 20th February.",
+// 	},
+// 	{
+// 		id: 3,
+// 		tag: "Event",
+
+// 		date: "Feb 10, 2026",
+// 		title: "Annual Sports Day – Registrations Open",
+// 		description:
+// 			"Students from Classes 3–12 can register for Sports Day events. Last date for registration is 22nd February. Please contact your respective class teacher for the registration form.",
+// 	},
+// 	{
+// 		id: 4,
+// 		tag: "Fee",
+
+// 		date: "Feb 5, 2026",
+// 		title: "Q1 Fee Payment Deadline – March 5",
+// 		description:
+// 			"Parents are reminded to clear Q1 2026 fee dues before March 5 to avoid a late fee penalty. Online payment is available on the parent portal.",
+// 	},
+// ];
+
 const SchoolLanding = () => {
 	return (
 		<div className="min-h-screen min-w-screen flex flex-col bg-slate-100">
@@ -87,7 +126,7 @@ const SchoolLanding = () => {
 							</div>
 						</div>
 						<div className=" flex items-center gap-3 rounded-xl px-4 py-3 bg-white/10 flex-1 text-white max-w-[calc(30%)]">
-							<School/>
+							<School />
 							<div className="flex flex-col">
 								<p className="text-white text-sm">Nursery-XII</p>
 								<span className="text-blue-300 text-xs">Classess</span>
@@ -141,3 +180,76 @@ const SchoolLanding = () => {
 };
 
 export default memo(SchoolLanding);
+
+// <div className="flex flex-row divide-y-0 divide-x divide-slate-100">
+// 	{/* Left: list */}
+// 	<div className="w-[260px] shrink-0 p-3 space-y-1.5 overflow-y-auto max-h-[400px]">
+// 		{ANNOUNCEMENTS.map((a) => (
+// 			<button
+// 				key={a.id}
+// 				onClick={() => setActive(a)}
+// 				className={`w-full text-left rounded-xl px-4 py-3 transition-all duration-150 flex flex-col gap-1.5 border ${
+// 					active?.id === a.id
+// 						? "bg-blue-50 border-blue-200"
+// 						: "bg-white border-transparent hover:bg-slate-50 hover:border-slate-200"
+// 				}`}
+// 			>
+// 				<div className="flex items-center justify-between">
+// 					<span
+// 						className={`text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-600`}
+// 					>
+// 						{a.tag}
+// 					</span>
+// 					<span className="text-slate-400 text-[10px]">{a.date}</span>
+// 				</div>
+// 				<p
+// 					className={`text-xs font-semibold leading-snug ${
+// 						active?.id === a.id ? "text-blue-800" : "text-slate-700"
+// 					}`}
+// 				>
+// 					{a.title}
+// 				</p>
+// 			</button>
+// 		))}
+// 	</div>
+
+// 	{/* Right: detail */}
+// 	<div className="flex-1 p-6 flex flex-col gap-3">
+// 		{!active ? (
+// 			<div className="flex flex-col items-center justify-center h-full py-10 text-center">
+// 				<Megaphone className="w-8 h-8 text-slate-300 mb-3" />
+// 				<p className="text-slate-400 text-sm">
+// 					Select an announcement to read it
+// 				</p>
+// 			</div>
+// 		) : (
+// 			<>
+// 				<div className="flex items-center justify-between">
+// 					<span
+// 						className={`text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-600`}
+// 					>
+// 						{active.tag}
+// 					</span>
+// 					<span className="text-slate-400 text-xs">{active.date}</span>
+// 				</div>
+// 				<h3 className="text-lg font-bold text-slate-900 leading-snug">
+// 					{active.title}
+// 				</h3>
+// 				<p className="text-slate-500 text-sm leading-relaxed">
+// 					{active.description}
+// 				</p>
+// 				<div className="mt-auto pt-4 border-t border-slate-100">
+// 					<p className="text-slate-400 text-xs">
+// 						For queries, contact the school office or email{" "}
+// 						<a
+// 							href={`mailto:${SCHOOL.email}`}
+// 							className="text-blue-600 hover:underline"
+// 						>
+// 							{SCHOOL.email}
+// 						</a>
+// 					</p>
+// 				</div>
+// 			</>
+// 		)}
+// 	</div>
+// </div>;
