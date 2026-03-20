@@ -79,10 +79,10 @@ const SchoolLanding = () => {
 					</a>
 				</div>
 			</header>
-			<div className="flex-1 max-w-5xl mx-auto w-full flex flex-col gap-5 px-4 py-6">
+			<div className="flex-1 max-w-5xl mx-auto w-full flex flex-col gap-5 px-4 py-6 ">
 				{/* Hero section  */}
-				<div className="w-full rounded-2xl flex flex-col p-8 overflow-hidden bg-blue-600">
-					<div className="flex  gap-5 ">
+				<div className="w-full rounded-2xl flex flex-col overflow-hidden bg-blue-600 p-6 md:p-8">
+					<div className="flex gap-5  flex-col md:flex-row">
 						<div className="flex justify-center font-bold items-center w-20 h-20 rounded-2xl bg-white text-blue-600 text-xl shrink-0 shadow-lg">
 							PW
 						</div>
@@ -99,7 +99,7 @@ const SchoolLanding = () => {
 							</div>
 						</div>
 
-						<div className="flex flex-col items-center gap-2">
+						<div className="flex flex-col  gap-2">
 							<a
 								href="/login"
 								className="flex items-center justify-center gap-2 px-6 py-2 rounded-lg bg-white text-blue-600 hover:bg-blue-50 transition-colors"
@@ -124,22 +124,22 @@ const SchoolLanding = () => {
 							</a>
 						</div>
 					</div>
-					<div className="flex flex-wrap  justify-around mt-6">
-						<div className=" flex items-center gap-3 rounded-xl px-4 py-3 bg-white/10 flex-1 text-white max-w-[calc(30%)]">
+					<div className="flex flex-col md:flex-row flex-wrap  justify-around mt-6 gap-2 md:gap-0">
+						<div className=" flex items-center gap-3 rounded-xl px-4 py-3 bg-white/10 flex-1 text-white md:max-w-[calc(30%)]">
 							<UsersRound />
 							<div className="flex flex-col">
 								<p className="text-white text-sm">2000+</p>
 								<span className="text-blue-300 text-xs">Students</span>
 							</div>
 						</div>
-						<div className=" flex items-center gap-3 rounded-xl px-4 py-3 bg-white/10 flex-1 text-white max-w-[calc(30%)]">
+						<div className=" flex items-center gap-3 rounded-xl px-4 py-3 bg-white/10 flex-1 text-white md:max-w-[calc(30%)]">
 							<School />
 							<div className="flex flex-col">
 								<p className="text-white text-sm">Nursery-XII</p>
 								<span className="text-blue-300 text-xs">Classess</span>
 							</div>
 						</div>
-						<div className=" flex items-center gap-3 rounded-xl px-4 py-3 bg-white/10 flex-1 text-white max-w-[calc(30%)]">
+						<div className=" flex items-center gap-3 rounded-xl px-4 py-3 bg-white/10 flex-1 text-white md:max-w-[calc(30%)]">
 							<BellRing />
 							<div className="flex flex-col">
 								<p className="text-white text-sm">0</p>
@@ -168,9 +168,9 @@ const SchoolLanding = () => {
 					{info?.announcements?.length === 0 ? (
 						<EmptyAnnouncements />
 					) : (
-						<div className="flex  divide-x divide-slate-100">
+						<div className="flex  divide-x divide-slate-100 flex-col md:flex-row divide-y">
 							{/* Left: list */}
-							<div className="w-[260px] shrink-0 p-3 space-y-1.5 overflow-y-auto max-h-[400px]">
+							<div className="md:w-[260px] shrink-0 p-3 space-y-1.5 overflow-y-auto max-h-[400px]">
 								{info?.announcements?.map((a) => (
 									<button
 										key={a.id}
