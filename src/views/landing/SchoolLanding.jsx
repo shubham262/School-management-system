@@ -1,4 +1,16 @@
-import { Bell, ChevronRight, GraduationCap, Megaphone } from "lucide-react";
+/* eslint-disable @next/next/no-html-link-for-pages */
+import {
+	Bell,
+	BellRing,
+	ChevronRight,
+	GraduationCap,
+	Mail,
+	MapPin,
+	Megaphone,
+	Phone,
+	School,
+	UsersRound,
+} from "lucide-react";
 import React, { memo } from "react";
 
 const SchoolLanding = () => {
@@ -23,6 +35,73 @@ const SchoolLanding = () => {
 			</header>
 			<div className="flex-1 max-w-5xl mx-auto w-full flex flex-col gap-5 px-4 py-6">
 				{/* Hero section  */}
+				<div className="w-full rounded-2xl flex flex-col p-8 overflow-hidden bg-blue-600">
+					<div className="flex  gap-5 ">
+						<div className="flex justify-center font-bold items-center w-20 h-20 rounded-2xl bg-white text-blue-600 text-xl shrink-0 shadow-lg">
+							PW
+						</div>
+
+						<div className="flex-1 flex flex-col">
+							<h1 className="text-2xl text-white font-bold">
+								PhysicsWallah School
+							</h1>
+							<div className="flex items-center gap-2 text-xs text-blue-50 mt-2">
+								<MapPin className="w-4 h-4 text-white" />
+								<span>
+									Noida sector-6 ,Mahavir colony, Noida, Uttar Pradesh
+								</span>
+							</div>
+						</div>
+
+						<div className="flex flex-col items-center gap-2">
+							<a
+								href="/login"
+								className="flex items-center justify-center gap-2 px-6 py-2 rounded-lg bg-white text-blue-600 hover:bg-blue-50 transition-colors"
+							>
+								Login
+								<ChevronRight className="w-4 h-4" />
+							</a>
+							<a
+								href=""
+								className="flex items-center justify-center text-blue-200 text-xs hover:text-white gap-1"
+							>
+								<Phone className="w-3 h-3" />
+								9876345412
+							</a>
+
+							<a
+								href=""
+								className="flex items-center justify-center text-blue-200 text-xs hover:text-white gap-1"
+							>
+								<Mail className="w-3 h-3" />
+								physicsWallah@pw.live
+							</a>
+						</div>
+					</div>
+					<div className="flex flex-wrap  justify-around mt-6">
+						<div className=" flex items-center gap-3 rounded-xl px-4 py-3 bg-white/10 flex-1 text-white max-w-[calc(30%)]">
+							<UsersRound />
+							<div className="flex flex-col">
+								<p className="text-white text-sm">2000+</p>
+								<span className="text-blue-300 text-xs">Students</span>
+							</div>
+						</div>
+						<div className=" flex items-center gap-3 rounded-xl px-4 py-3 bg-white/10 flex-1 text-white max-w-[calc(30%)]">
+							<School/>
+							<div className="flex flex-col">
+								<p className="text-white text-sm">Nursery-XII</p>
+								<span className="text-blue-300 text-xs">Classess</span>
+							</div>
+						</div>
+						<div className=" flex items-center gap-3 rounded-xl px-4 py-3 bg-white/10 flex-1 text-white max-w-[calc(30%)]">
+							<BellRing />
+							<div className="flex flex-col">
+								<p className="text-white text-sm">0</p>
+								<span className="text-blue-300 text-xs">Notices</span>
+							</div>
+						</div>
+					</div>
+				</div>
 				{/* Announcements  */}
 				<div className="w-full bg-white flex flex-col border border-slate-200 rounded-2xl overflow-hidden">
 					<div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
