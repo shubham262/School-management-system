@@ -181,6 +181,26 @@ const SchoolLanding = () => {
 
 export default memo(SchoolLanding);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // <div className="flex flex-row divide-y-0 divide-x divide-slate-100">
 // 	{/* Left: list */}
 // 	<div className="w-[260px] shrink-0 p-3 space-y-1.5 overflow-y-auto max-h-[400px]">
