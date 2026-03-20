@@ -1,4 +1,6 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
+"use client";
+import EmptyAnnouncements from "@/components/EmptyAnnouncements";
 import {
 	Bell,
 	BellRing,
@@ -11,48 +13,53 @@ import {
 	School,
 	UsersRound,
 } from "lucide-react";
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 
-// const ANNOUNCEMENTS = [
-// 	{
-// 		id: 1,
-// 		tag: "Exam",
+const ANNOUNCEMENTS = [
+	{
+		id: 1,
+		tag: "Exam",
 
-// 		date: "Feb 17, 2026",
-// 		title: "Annual Examination Schedule Released",
-// 		description:
-// 			"The annual exam timetable for Classes 1–12 has been published. Students are advised to check the notice board and school portal for complete details and subject-wise timings.",
-// 	},
-// 	{
-// 		id: 2,
-// 		tag: "Holiday",
+		date: "Feb 17, 2026",
+		title: "Annual Examination Schedule Released",
+		description:
+			"The annual exam timetable for Classes 1–12 has been published. Students are advised to check the notice board and school portal for complete details and subject-wise timings.",
+	},
+	{
+		id: 2,
+		tag: "Holiday",
 
-// 		date: "Feb 14, 2026",
-// 		title: "School Closed on Feb 19 – Founders' Day",
-// 		description:
-// 			"In celebration of Founders' Day, the school will remain closed on Wednesday, 19th February 2026. Regular classes resume from Thursday, 20th February.",
-// 	},
-// 	{
-// 		id: 3,
-// 		tag: "Event",
+		date: "Feb 14, 2026",
+		title: "School Closed on Feb 19 – Founders' Day",
+		description:
+			"In celebration of Founders' Day, the school will remain closed on Wednesday, 19th February 2026. Regular classes resume from Thursday, 20th February.",
+	},
+	{
+		id: 3,
+		tag: "Event",
 
-// 		date: "Feb 10, 2026",
-// 		title: "Annual Sports Day – Registrations Open",
-// 		description:
-// 			"Students from Classes 3–12 can register for Sports Day events. Last date for registration is 22nd February. Please contact your respective class teacher for the registration form.",
-// 	},
-// 	{
-// 		id: 4,
-// 		tag: "Fee",
+		date: "Feb 10, 2026",
+		title: "Annual Sports Day – Registrations Open",
+		description:
+			"Students from Classes 3–12 can register for Sports Day events. Last date for registration is 22nd February. Please contact your respective class teacher for the registration form.",
+	},
+	{
+		id: 4,
+		tag: "Fee",
 
-// 		date: "Feb 5, 2026",
-// 		title: "Q1 Fee Payment Deadline – March 5",
-// 		description:
-// 			"Parents are reminded to clear Q1 2026 fee dues before March 5 to avoid a late fee penalty. Online payment is available on the parent portal.",
-// 	},
-// ];
+		date: "Feb 5, 2026",
+		title: "Q1 Fee Payment Deadline – March 5",
+		description:
+			"Parents are reminded to clear Q1 2026 fee dues before March 5 to avoid a late fee penalty. Online payment is available on the parent portal.",
+	},
+];
 
 const SchoolLanding = () => {
+	const [info, setInfo] = useState({
+		announcements: [...(ANNOUNCEMENTS || [])],
+		active: ANNOUNCEMENTS?.length ? ANNOUNCEMENTS?.[0] : null,
+	});
+
 	return (
 		<div className="min-h-screen min-w-screen flex flex-col bg-slate-100">
 			<header className="bg-white border-b border-slate-200">
@@ -158,18 +165,88 @@ const SchoolLanding = () => {
 						</span>
 					</div>
 					{/* empty state for no announcements  */}
-					<div className="flex flex-col items-center justify-center py-14 px-6 text-center">
-						<div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
-							<Bell className="w-6 h-6 text-slate-400" />
+					{info?.announcements?.length === 0 ? (
+						<EmptyAnnouncements />
+					) : (
+						<div className="flex  divide-x divide-slate-100">
+							{/* Left: list */}
+							<div className="w-[260px] shrink-0 p-3 space-y-1.5 overflow-y-auto max-h-[400px]">
+								{info?.announcements?.map((a) => (
+									<button
+										key={a.id}
+										onClick={() => setInfo((prev) => ({ ...prev, active: a }))}
+										className={`w-full text-left rounded-xl px-4 py-3 transition-all duration-150 flex flex-col gap-1.5 border ${
+											info?.active?.id === a.id
+												? "bg-blue-50 border-blue-200"
+												: "bg-white border-transparent hover:bg-slate-50 hover:border-slate-200"
+										}`}
+									>
+										<div className="flex items-center justify-between">
+											<span
+												className={`text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-600`}
+											>
+												{a.tag}
+											</span>
+											<span className="text-slate-400 text-[10px]">
+												{a.date}
+											</span>
+										</div>
+										<p
+											className={`text-xs font-semibold leading-snug ${
+												info?.active?.id === a.id
+													? "text-blue-800"
+													: "text-slate-700"
+											}`}
+										>
+											{a.title}
+										</p>
+									</button>
+								))}
+							</div>
+
+							{/* Right: detail */}
+							<div className="flex-1 p-6 flex flex-col gap-3">
+								{!info?.active ? (
+									<div className="flex flex-col items-center justify-center h-full py-10 text-center">
+										<Megaphone className="w-8 h-8 text-slate-300 mb-3" />
+										<p className="text-slate-400 text-sm">
+											Select an announcement to read it
+										</p>
+									</div>
+								) : (
+									<>
+										<div className="flex items-center justify-between">
+											<span
+												className={`text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-600`}
+											>
+												{info?.active.tag}
+											</span>
+											<span className="text-slate-400 text-xs">
+												{info?.active.date}
+											</span>
+										</div>
+										<h3 className="text-lg font-bold text-slate-900 leading-snug">
+											{info?.active.title}
+										</h3>
+										<p className="text-slate-500 text-sm leading-relaxed">
+											{info?.active.description}
+										</p>
+										<div className="mt-auto pt-4 border-t border-slate-100">
+											<p className="text-slate-400 text-xs">
+												For queries, contact the school office or email{" "}
+												<a
+													href={`mailto:physicsWallah@pw.live`}
+													className="text-blue-600 hover:underline"
+												>
+													physicsWallah@pw.live
+												</a>
+											</p>
+										</div>
+									</>
+								)}
+							</div>
 						</div>
-						<p className="text-slate-700 font-semibold text-sm">
-							No Announcements yet
-						</p>
-						<p className="text-slate-400 text-xs mt-1.5 max-w-xs">
-							There are no announcements at the moment. <br></br>Check back
-							later for updates from the school
-						</p>
-					</div>
+					)}
 				</div>
 			</div>
 			<footer className="bg-white flex items-center justify-center text-center text-xs text-slate-400 py-4  border-t border-slate-200">
@@ -180,96 +257,3 @@ const SchoolLanding = () => {
 };
 
 export default memo(SchoolLanding);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// <div className="flex flex-row divide-y-0 divide-x divide-slate-100">
-// 	{/* Left: list */}
-// 	<div className="w-[260px] shrink-0 p-3 space-y-1.5 overflow-y-auto max-h-[400px]">
-// 		{ANNOUNCEMENTS.map((a) => (
-// 			<button
-// 				key={a.id}
-// 				onClick={() => setActive(a)}
-// 				className={`w-full text-left rounded-xl px-4 py-3 transition-all duration-150 flex flex-col gap-1.5 border ${
-// 					active?.id === a.id
-// 						? "bg-blue-50 border-blue-200"
-// 						: "bg-white border-transparent hover:bg-slate-50 hover:border-slate-200"
-// 				}`}
-// 			>
-// 				<div className="flex items-center justify-between">
-// 					<span
-// 						className={`text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-600`}
-// 					>
-// 						{a.tag}
-// 					</span>
-// 					<span className="text-slate-400 text-[10px]">{a.date}</span>
-// 				</div>
-// 				<p
-// 					className={`text-xs font-semibold leading-snug ${
-// 						active?.id === a.id ? "text-blue-800" : "text-slate-700"
-// 					}`}
-// 				>
-// 					{a.title}
-// 				</p>
-// 			</button>
-// 		))}
-// 	</div>
-
-// 	{/* Right: detail */}
-// 	<div className="flex-1 p-6 flex flex-col gap-3">
-// 		{!active ? (
-// 			<div className="flex flex-col items-center justify-center h-full py-10 text-center">
-// 				<Megaphone className="w-8 h-8 text-slate-300 mb-3" />
-// 				<p className="text-slate-400 text-sm">
-// 					Select an announcement to read it
-// 				</p>
-// 			</div>
-// 		) : (
-// 			<>
-// 				<div className="flex items-center justify-between">
-// 					<span
-// 						className={`text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-600`}
-// 					>
-// 						{active.tag}
-// 					</span>
-// 					<span className="text-slate-400 text-xs">{active.date}</span>
-// 				</div>
-// 				<h3 className="text-lg font-bold text-slate-900 leading-snug">
-// 					{active.title}
-// 				</h3>
-// 				<p className="text-slate-500 text-sm leading-relaxed">
-// 					{active.description}
-// 				</p>
-// 				<div className="mt-auto pt-4 border-t border-slate-100">
-// 					<p className="text-slate-400 text-xs">
-// 						For queries, contact the school office or email{" "}
-// 						<a
-// 							href={`mailto:${SCHOOL.email}`}
-// 							className="text-blue-600 hover:underline"
-// 						>
-// 							{SCHOOL.email}
-// 						</a>
-// 					</p>
-// 				</div>
-// 			</>
-// 		)}
-// 	</div>
-// </div>;
