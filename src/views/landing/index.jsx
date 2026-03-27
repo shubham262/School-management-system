@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { UserLock, UserPen, UserStar } from "lucide-react";
 
 import { useRouter } from "next/navigation";
