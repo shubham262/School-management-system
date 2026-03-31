@@ -3,7 +3,8 @@
 "use client";
 import { message } from "antd";
 import { MoveLeft, Upload, X } from "lucide-react";
-import Image from "next/image";
+import api from "@/service";
+import { cloudinaryConfig } from "@/config";
 import Link from "next/link";
 import React, { useCallback, useState } from "react";
 
@@ -32,6 +33,8 @@ const SchoolInformation = () => {
 		classes: [],
 		logo: null,
 		logoPreview: null,
+		logoUrl: null,
+		uploadingLogo: false,
 	});
 
 	const handleSelectClasses = useCallback(
@@ -50,8 +53,10 @@ const SchoolInformation = () => {
 		[info?.classes]
 	);
 
-	const handleImageUpload = useCallback((event) => {
+	const handleImageUpload = useCallback(async (event) => {
 		const file = event?.target?.files?.[0];
+
+		console.log("cloudinary config", cloudinaryConfig);
 		if (file) {
 			const fileSize = file?.size;
 			if (fileSize > 5 * 1024 * 1024) {
@@ -65,6 +70,22 @@ const SchoolInformation = () => {
 				setInfo((prev) => ({ ...prev, logoPreview: reader.result }));
 			};
 			reader.readAsDataURL(file);
+
+			const form = new FormData();
+			form.append("file", file);
+			form.append("upload_preset", cloudinaryConfig?.uploadPreset);
+			try {
+				const response = await fetch(
+					`https://api.cloudinary.com/v1_1/${cloudinaryConfig?.cloudName}/image/upload`,
+					{
+						method: "POST",
+						body: form,
+					}
+				);
+
+				const data = await response.json();
+				console.log("cloudinary response", data);
+			} catch (error) {}
 		}
 	}, []);
 
