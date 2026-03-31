@@ -1,12 +1,14 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { message } from "antd";
+import { message, Spin } from "antd";
 import { MoveLeft, Upload, X } from "lucide-react";
 import api from "@/service";
 import { cloudinaryConfig } from "@/config";
 import Link from "next/link";
 import React, { useCallback, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { updateSchoolInformation } from "@/service/auth";
 
 const availableClasses = [
 	"Nursery",
@@ -27,6 +29,10 @@ const availableClasses = [
 ];
 
 const SchoolInformation = () => {
+	const params = useParams();
+	const router = useRouter();
+	const slug = params?.id;
+
 	const [info, setInfo] = useState({
 		schoolName: "",
 		location: "",
@@ -35,6 +41,9 @@ const SchoolInformation = () => {
 		logoPreview: null,
 		logoUrl: null,
 		uploadingLogo: false,
+		email: "",
+		phone: "",
+		website: "",
 	});
 
 	const handleSelectClasses = useCallback(
@@ -56,7 +65,6 @@ const SchoolInformation = () => {
 	const handleImageUpload = useCallback(async (event) => {
 		const file = event?.target?.files?.[0];
 
-		console.log("cloudinary config", cloudinaryConfig);
 		if (file) {
 			const fileSize = file?.size;
 			if (fileSize > 5 * 1024 * 1024) {
@@ -66,7 +74,6 @@ const SchoolInformation = () => {
 			setInfo((prev) => ({ ...prev, logo: file }));
 			const reader = new FileReader();
 			reader.onloadend = () => {
-				console.log("reader result", reader.result);
 				setInfo((prev) => ({ ...prev, logoPreview: reader.result }));
 			};
 			reader.readAsDataURL(file);
@@ -75,6 +82,10 @@ const SchoolInformation = () => {
 			form.append("file", file);
 			form.append("upload_preset", cloudinaryConfig?.uploadPreset);
 			try {
+				setInfo((prev) => ({
+					...prev,
+					uploadingLogo: true,
+				}));
 				const response = await fetch(
 					`https://api.cloudinary.com/v1_1/${cloudinaryConfig?.cloudName}/image/upload`,
 					{
@@ -84,7 +95,14 @@ const SchoolInformation = () => {
 				);
 
 				const data = await response.json();
-				console.log("cloudinary response", data);
+				if (data?.secure_url) {
+					setInfo((prev) => ({
+						...prev,
+						logoUrl: data?.secure_url,
+						uploadingLogo: false,
+					}));
+					message.success("Logo uploaded successfully");
+				}
 			} catch (error) {}
 		}
 	}, []);
@@ -93,6 +111,59 @@ const SchoolInformation = () => {
 		e?.preventDefault();
 		setInfo((prev) => ({ ...prev, logoPreview: null, logo: null }));
 	}, []);
+
+	const handleCompleteSetup = useCallback(async () => {
+		if (!slug) {
+			return message.error("Slug is missing");
+		}
+		if (info?.uploadingLogo) {
+			return message.error("Please wait until logo is uploaded");
+		}
+		if (
+			!info?.schoolName ||
+			!info?.location ||
+			!info?.classes?.length ||
+			!info?.email ||
+			!info?.phone
+		) {
+			return message.error("Please fill all required fields");
+		}
+
+		const payload = {
+			payloadForUpdate: {
+				name: info?.schoolName,
+				details: {
+					email: info?.email,
+					phone: info?.phone,
+					address: info?.location,
+					logo: info?.logoUrl || "",
+					website: info?.website,
+					available_classes: info?.classes,
+				},
+			},
+		};
+
+		try {
+			const response = await updateSchoolInformation(slug, payload);
+			const { slug: updatedSlug } = response || {};
+			message.success("School information updated successfully");
+			router.push(`/${updatedSlug}`);
+		} catch (error) {
+			console.log(error);
+			message.error(error?.response?.data?.message || "Something went wrong");
+		}
+	}, [
+		slug,
+		info?.classes,
+		info?.email,
+		info?.location,
+		info?.logoUrl,
+		info?.phone,
+		info?.schoolName,
+		info?.website,
+		info?.uploadingLogo,
+		router,
+	]);
 
 	return (
 		<div className="w-screen  min-h-screen bg-slate-100 flex justify-center items-center p-4 overflow-y-auto">
@@ -124,6 +195,51 @@ const SchoolInformation = () => {
 								}
 								type="text"
 								placeholder="Enter Your School Name"
+								className="w-full rounded-lg outline-none  border border-slate-300 px-3 py-2  text-sm focus:border-slate-500"
+							/>
+						</div>
+
+						<div className="flex flex-col mb-5">
+							<label className="text-sm mb-1 text-slate-700 font-medium">
+								School Email <span className="text-red-500">*</span>
+							</label>
+							<input
+								value={info?.email}
+								onChange={(e) =>
+									setInfo((prev) => ({ ...prev, email: e?.target?.value }))
+								}
+								type="text"
+								placeholder="Enter Your School email"
+								className="w-full rounded-lg outline-none  border border-slate-300 px-3 py-2  text-sm focus:border-slate-500"
+							/>
+						</div>
+
+						<div className="flex flex-col mb-5">
+							<label className="text-sm mb-1 text-slate-700 font-medium">
+								School Phone Number <span className="text-red-500">*</span>
+							</label>
+							<input
+								value={info?.phone}
+								onChange={(e) =>
+									setInfo((prev) => ({ ...prev, phone: e?.target?.value }))
+								}
+								type="text"
+								placeholder="Enter Your School Phone"
+								className="w-full rounded-lg outline-none  border border-slate-300 px-3 py-2  text-sm focus:border-slate-500"
+							/>
+						</div>
+
+						<div className="flex flex-col mb-5">
+							<label className="text-sm mb-1 text-slate-700 font-medium">
+								School website
+							</label>
+							<input
+								value={info?.website}
+								onChange={(e) =>
+									setInfo((prev) => ({ ...prev, website: e?.target?.value }))
+								}
+								type="text"
+								placeholder="Enter Your School website"
 								className="w-full rounded-lg outline-none  border border-slate-300 px-3 py-2  text-sm focus:border-slate-500"
 							/>
 						</div>
@@ -213,16 +329,20 @@ const SchoolInformation = () => {
 											{(info?.logo?.size / (1024 * 1024)).toFixed(2)} MB
 										</p>
 									</div>
-									<button className="cursor-pointer ">
-										<X />
-									</button>
+									{info?.uploadingLogo ? (
+										<Spin />
+									) : (
+										<button className="cursor-pointer ">
+											<X />
+										</button>
+									)}
 								</div>
 							)}
 						</div>
 					</form>
 
 					<button
-						onClick={handleRemoveImage}
+						onClick={handleCompleteSetup}
 						className="w-full rounded-lg bg-blue-600 px-4 py-2.5 cursor-pointer text-sm text-white font-medium hover:bg-blue-700"
 					>
 						Complete Setup

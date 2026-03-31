@@ -1,4 +1,4 @@
 export const cloudinaryConfig = {
-	cloudName: "dfcwze11a",
-	uploadPreset: "school_management",
+	cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+	uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
 };
