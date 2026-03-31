@@ -1,6 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/immutability */
 /* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
 import EmptyAnnouncements from "@/components/EmptyAnnouncements";
+import { fetchSchoolInformation } from "@/service/auth";
 import {
 	Bell,
 	BellRing,
@@ -13,7 +16,8 @@ import {
 	School,
 	UsersRound,
 } from "lucide-react";
-import React, { memo, useState } from "react";
+import { useParams } from "next/navigation";
+import React, { memo, useEffect, useCallback, useState } from "react";
 
 const ANNOUNCEMENTS = [
 	{
@@ -55,10 +59,30 @@ const ANNOUNCEMENTS = [
 ];
 
 const SchoolLanding = () => {
+	const params = useParams();
+	const slug = params?.id;
 	const [info, setInfo] = useState({
 		announcements: [...(ANNOUNCEMENTS || [])],
 		active: ANNOUNCEMENTS?.length ? ANNOUNCEMENTS?.[0] : null,
+		schoolInfo: null,
 	});
+
+	useEffect(() => {
+		fetchSchoolInfo();
+	}, []);
+
+	const fetchSchoolInfo = useCallback(async () => {
+		try {
+			const response = await fetchSchoolInformation(slug);
+			const { data, totalStudents } = response || {};
+			setInfo((prev) => ({ ...prev, schoolInfo: { ...data, totalStudents } }));
+		} catch (error) {
+			console.log("Error fetching school information:", error);
+			message.error(
+				"Failed to fetch school information. Please try again later."
+			);
+		}
+	}, [slug]);
 
 	return (
 		<div className="min-h-screen min-w-screen flex flex-col bg-slate-100">
@@ -69,7 +93,9 @@ const SchoolLanding = () => {
 							<GraduationCap className="w-5 h-5 text-white" />
 						</div>
 						<div>
-							<p className="font-semibold text-slate-800 text-sm ">PW School</p>
+							<p className="font-semibold text-slate-800 text-sm ">
+								{info?.schoolInfo?.name || ""}
+							</p>
 							<p className="text-slate-400 text-xs">CBSE Affiliation</p>
 						</div>
 					</div>
@@ -89,13 +115,11 @@ const SchoolLanding = () => {
 
 						<div className="flex-1 flex flex-col">
 							<h1 className="text-2xl text-white font-bold">
-								PhysicsWallah School
+								{info?.schoolInfo?.name || "PW School"}
 							</h1>
 							<div className="flex items-center gap-2 text-xs text-blue-50 mt-2">
 								<MapPin className="w-4 h-4 text-white" />
-								<span>
-									Noida sector-6 ,Mahavir colony, Noida, Uttar Pradesh
-								</span>
+								<span>{info?.schoolInfo?.details?.address || ""}</span>
 							</div>
 						</div>
 
@@ -112,7 +136,7 @@ const SchoolLanding = () => {
 								className="flex items-center justify-center text-blue-200 text-xs hover:text-white gap-1"
 							>
 								<Phone className="w-3 h-3" />
-								9876345412
+								{info?.schoolInfo?.details?.phone || ""}
 							</a>
 
 							<a
@@ -120,7 +144,7 @@ const SchoolLanding = () => {
 								className="flex items-center justify-center text-blue-200 text-xs hover:text-white gap-1"
 							>
 								<Mail className="w-3 h-3" />
-								physicsWallah@pw.live
+								{info?.schoolInfo?.details?.email || ""}
 							</a>
 						</div>
 					</div>
@@ -128,14 +152,23 @@ const SchoolLanding = () => {
 						<div className=" flex items-center gap-3 rounded-xl px-4 py-3 bg-white/10 flex-1 text-white md:max-w-[calc(30%)]">
 							<UsersRound />
 							<div className="flex flex-col">
-								<p className="text-white text-sm">2000+</p>
+								<p className="text-white text-sm">
+									{info?.schoolInfo?.totalStudents || 0}+
+								</p>
 								<span className="text-blue-300 text-xs">Students</span>
 							</div>
 						</div>
 						<div className=" flex items-center gap-3 rounded-xl px-4 py-3 bg-white/10 flex-1 text-white md:max-w-[calc(30%)]">
 							<School />
 							<div className="flex flex-col">
-								<p className="text-white text-sm">Nursery-XII</p>
+								<p className="text-white text-sm">
+									{info?.schoolInfo?.details?.available_classes?.[0]}-
+									{
+										info?.schoolInfo?.details?.available_classes?.[
+											info?.schoolInfo?.details?.available_classes.length - 1
+										]
+									}
+								</p>
 								<span className="text-blue-300 text-xs">Classess</span>
 							</div>
 						</div>
@@ -238,7 +271,7 @@ const SchoolLanding = () => {
 													href={`mailto:physicsWallah@pw.live`}
 													className="text-blue-600 hover:underline"
 												>
-													physicsWallah@pw.live
+													{info?.schoolInfo?.details?.email || ""}
 												</a>
 											</p>
 										</div>
