@@ -4,6 +4,7 @@
 "use client";
 import EmptyAnnouncements from "@/components/EmptyAnnouncements";
 import LandingLoader from "@/components/Loader";
+import { nameShortner } from "@/helper";
 import {
 	fetchSchoolAnnouncements,
 	fetchSchoolInformation,
@@ -21,6 +22,7 @@ import {
 	UsersRound,
 } from "lucide-react";
 import moment from "moment";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { memo, useEffect, useCallback, useState } from "react";
 
@@ -82,7 +84,16 @@ const SchoolLanding = () => {
 				<div className="mx-auto py-4 px-6 max-w-5xl  flex items-center justify-between">
 					<div className="flex items-center gap-3">
 						<div className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600">
-							<GraduationCap className="w-5 h-5 text-white" />
+							{info?.schoolInfo?.details?.logo ? (
+								<Image
+									width={100}
+									height={100}
+									src={info?.schoolInfo?.details?.logo}
+									alt="logo"
+								/>
+							) : (
+								<GraduationCap className="w-5 h-5 text-white" />
+							)}
 						</div>
 						<div>
 							<p className="font-semibold text-slate-800 text-sm ">
@@ -105,7 +116,16 @@ const SchoolLanding = () => {
 				<div className="w-full rounded-2xl flex flex-col overflow-hidden bg-blue-600 p-6 md:p-8">
 					<div className="flex gap-5  flex-col md:flex-row">
 						<div className="flex justify-center font-bold items-center w-20 h-20 rounded-2xl bg-white text-blue-600 text-xl shrink-0 shadow-lg">
-							PW
+							{info?.schoolInfo?.details?.logo ? (
+								<Image
+									width={100}
+									height={100}
+									src={info?.schoolInfo?.details?.logo}
+									alt="logo"
+								/>
+							) : (
+								nameShortner(info?.schoolInfo?.name || "")
+							)}
 						</div>
 
 						<div className="flex-1 flex flex-col">
