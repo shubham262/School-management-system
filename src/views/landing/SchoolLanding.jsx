@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
 import EmptyAnnouncements from "@/components/EmptyAnnouncements";
+import LandingLoader from "@/components/Loader";
 import { fetchSchoolInformation } from "@/service/auth";
 import {
 	Bell,
@@ -65,6 +66,7 @@ const SchoolLanding = () => {
 		announcements: [...(ANNOUNCEMENTS || [])],
 		active: ANNOUNCEMENTS?.length ? ANNOUNCEMENTS?.[0] : null,
 		schoolInfo: null,
+		loading: true,
 	});
 
 	useEffect(() => {
@@ -75,14 +77,26 @@ const SchoolLanding = () => {
 		try {
 			const response = await fetchSchoolInformation(slug);
 			const { data, totalStudents } = response || {};
-			setInfo((prev) => ({ ...prev, schoolInfo: { ...data, totalStudents } }));
+			setInfo((prev) => ({
+				...prev,
+				schoolInfo: { ...data, totalStudents },
+			}));
 		} catch (error) {
 			console.log("Error fetching school information:", error);
 			message.error(
 				"Failed to fetch school information. Please try again later."
 			);
+		} finally {
+			setInfo((prev) => ({
+				...prev,
+				loading: false,
+			}));
 		}
 	}, [slug]);
+
+	if (info?.loading) {
+		return <LandingLoader />;
+	}
 
 	return (
 		<div className="min-h-screen min-w-screen flex flex-col bg-slate-100">
