@@ -4,7 +4,10 @@
 "use client";
 import EmptyAnnouncements from "@/components/EmptyAnnouncements";
 import LandingLoader from "@/components/Loader";
-import { fetchSchoolInformation } from "@/service/auth";
+import {
+	fetchSchoolAnnouncements,
+	fetchSchoolInformation,
+} from "@/service/auth";
 import {
 	Bell,
 	BellRing,
@@ -17,54 +20,17 @@ import {
 	School,
 	UsersRound,
 } from "lucide-react";
-import { useParams } from "next/navigation";
+import moment from "moment";
+import { useParams, useRouter } from "next/navigation";
 import React, { memo, useEffect, useCallback, useState } from "react";
-
-const ANNOUNCEMENTS = [
-	{
-		id: 1,
-		tag: "Exam",
-
-		date: "Feb 17, 2026",
-		title: "Annual Examination Schedule Released",
-		description:
-			"The annual exam timetable for Classes 1–12 has been published. Students are advised to check the notice board and school portal for complete details and subject-wise timings.",
-	},
-	{
-		id: 2,
-		tag: "Holiday",
-
-		date: "Feb 14, 2026",
-		title: "School Closed on Feb 19 – Founders' Day",
-		description:
-			"In celebration of Founders' Day, the school will remain closed on Wednesday, 19th February 2026. Regular classes resume from Thursday, 20th February.",
-	},
-	{
-		id: 3,
-		tag: "Event",
-
-		date: "Feb 10, 2026",
-		title: "Annual Sports Day – Registrations Open",
-		description:
-			"Students from Classes 3–12 can register for Sports Day events. Last date for registration is 22nd February. Please contact your respective class teacher for the registration form.",
-	},
-	{
-		id: 4,
-		tag: "Fee",
-
-		date: "Feb 5, 2026",
-		title: "Q1 Fee Payment Deadline – March 5",
-		description:
-			"Parents are reminded to clear Q1 2026 fee dues before March 5 to avoid a late fee penalty. Online payment is available on the parent portal.",
-	},
-];
 
 const SchoolLanding = () => {
 	const params = useParams();
+	const router = useRouter();
 	const slug = params?.id;
 	const [info, setInfo] = useState({
-		announcements: [...(ANNOUNCEMENTS || [])],
-		active: ANNOUNCEMENTS?.length ? ANNOUNCEMENTS?.[0] : null,
+		announcements: [],
+		active: null,
 		schoolInfo: null,
 		loading: true,
 	});
@@ -75,11 +41,19 @@ const SchoolLanding = () => {
 
 	const fetchSchoolInfo = useCallback(async () => {
 		try {
-			const response = await fetchSchoolInformation(slug);
-			const { data, totalStudents } = response || {};
+			const [response1, response2] = await Promise.all([
+				fetchSchoolInformation(slug),
+				fetchSchoolAnnouncements(slug),
+			]);
+
+			const { data, totalStudents } = response1 || {};
+			const { schoolAnnoucements = [] } = response2 || {};
+
 			setInfo((prev) => ({
 				...prev,
 				schoolInfo: { ...data, totalStudents },
+				announcements: schoolAnnoucements,
+				active: schoolAnnoucements?.length ? schoolAnnoucements?.[0] : null,
 			}));
 		} catch (error) {
 			console.log("Error fetching school information:", error);
@@ -93,6 +67,10 @@ const SchoolLanding = () => {
 			}));
 		}
 	}, [slug]);
+
+	const handleNavigateToLogin = useCallback(() => {
+		router.push(`/${slug}/login`);
+	}, [slug, router]);
 
 	if (info?.loading) {
 		return <LandingLoader />;
@@ -114,7 +92,10 @@ const SchoolLanding = () => {
 						</div>
 					</div>
 
-					<a className="flex items-center bg-blue-600 hover:bg-blue-700 transition-all font-medium text-white text-sm py-2 px-4 rounded-lg cursor-pointer">
+					<a
+						onClick={handleNavigateToLogin}
+						className="flex items-center bg-blue-600 hover:bg-blue-700 transition-all font-medium text-white text-sm py-2 px-4 rounded-lg cursor-pointer"
+					>
 						Login <ChevronRight className=" w-5 h-5" />
 					</a>
 				</div>
@@ -129,7 +110,7 @@ const SchoolLanding = () => {
 
 						<div className="flex-1 flex flex-col">
 							<h1 className="text-2xl text-white font-bold">
-								{info?.schoolInfo?.name || "PW School"}
+								{info?.schoolInfo?.name || ""}
 							</h1>
 							<div className="flex items-center gap-2 text-xs text-blue-50 mt-2">
 								<MapPin className="w-4 h-4 text-white" />
@@ -139,7 +120,7 @@ const SchoolLanding = () => {
 
 						<div className="flex flex-col  gap-2">
 							<a
-								href="/login"
+								onClick={handleNavigateToLogin}
 								className="flex items-center justify-center gap-2 px-6 py-2 rounded-lg bg-white text-blue-600 hover:bg-blue-50 transition-colors"
 							>
 								Login
@@ -189,7 +170,9 @@ const SchoolLanding = () => {
 						<div className=" flex items-center gap-3 rounded-xl px-4 py-3 bg-white/10 flex-1 text-white md:max-w-[calc(30%)]">
 							<BellRing />
 							<div className="flex flex-col">
-								<p className="text-white text-sm">0</p>
+								<p className="text-white text-sm">
+									{info?.announcements?.length || 0}
+								</p>
 								<span className="text-blue-300 text-xs">Notices</span>
 							</div>
 						</div>
@@ -207,9 +190,15 @@ const SchoolLanding = () => {
 							</h2>
 						</div>
 
-						<span className="text-xs font-semibold bg-slate-100 px-2.5 py-1 rounded-full text-slate-400">
-							No Notices
-						</span>
+						{info?.announcements?.length ? (
+							<span className="text-xs font-semibold bg-blue-600 px-2.5 py-1 rounded-full text-white">
+								{info?.announcements?.length} Notices
+							</span>
+						) : (
+							<span className="text-xs font-semibold bg-slate-100 px-2.5 py-1 rounded-full text-slate-400">
+								No Notices
+							</span>
+						)}
 					</div>
 					{/* empty state for no announcements  */}
 					{info?.announcements?.length === 0 ? (
@@ -220,7 +209,7 @@ const SchoolLanding = () => {
 							<div className="md:w-[260px] shrink-0 p-3 space-y-1.5 overflow-y-auto max-h-[400px]">
 								{info?.announcements?.map((a) => (
 									<button
-										key={a.id}
+										key={a._id}
 										onClick={() => setInfo((prev) => ({ ...prev, active: a }))}
 										className={`w-full text-left rounded-xl px-4 py-3 transition-all duration-150 flex flex-col gap-1.5 border ${
 											info?.active?.id === a.id
@@ -235,7 +224,7 @@ const SchoolLanding = () => {
 												{a.tag}
 											</span>
 											<span className="text-slate-400 text-[10px]">
-												{a.date}
+												{moment(a.createdAt).format("MMM DD, YYYY")}
 											</span>
 										</div>
 										<p
@@ -269,7 +258,7 @@ const SchoolLanding = () => {
 												{info?.active.tag}
 											</span>
 											<span className="text-slate-400 text-xs">
-												{info?.active.date}
+												{moment(info?.active.createdAt).format("MMM DD, YYYY")}
 											</span>
 										</div>
 										<h3 className="text-lg font-bold text-slate-900 leading-snug">
@@ -297,7 +286,8 @@ const SchoolLanding = () => {
 				</div>
 			</div>
 			<footer className="bg-white flex items-center justify-center text-center text-xs text-slate-400 py-4  border-t border-slate-200">
-				© {new Date().getFullYear()} PW School. All rights reserved.
+				© {new Date().getFullYear()} {info?.schoolInfo?.name || ""}. All rights
+				reserved.
 			</footer>
 		</div>
 	);
