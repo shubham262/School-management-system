@@ -29,6 +29,7 @@ import React, { memo, useEffect, useCallback, useState } from "react";
 const SchoolLanding = () => {
 	const params = useParams();
 	const router = useRouter();
+
 	const slug = params?.id;
 	const [info, setInfo] = useState({
 		announcements: [],
