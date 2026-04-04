@@ -33,25 +33,6 @@ const roleOptions = [
 	{ label: "Teachers", value: "teachers" },
 ];
 
-const columns = [
-	{ title: "Name", dataIndex: "name", key: "name" },
-	{ title: "Email", dataIndex: "email", key: "email" },
-	{
-		title: "Role",
-		dataIndex: "role",
-		key: "role",
-		render: (role) => <Tag color="blue">{role}</Tag>,
-	},
-	{
-		title: "Source",
-		dataIndex: "source",
-		key: "source",
-		render: (src) => (
-			<Tag color={src === "upload" ? "purple" : "green"}>{src}</Tag>
-		),
-	},
-];
-
 const template = [
 	{ name: "Riya Sharma", email: "riya@example.com", role: "students" },
 	{ name: "Ankit Verma", email: "ankit@example.com", role: "teachers" },
@@ -64,6 +45,47 @@ const AddBulkUsersPage = () => {
 	const [uploadError, setUploadError] = useState(null);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [form] = Form.useForm();
+	const removeRow = (key) => {
+		setPreview((prev) => prev.filter((item) => item.key !== key));
+	};
+
+	const columns = useMemo(
+		() => [
+			{ title: "Name", dataIndex: "name", key: "name" },
+			{ title: "Email", dataIndex: "email", key: "email" },
+			{
+				title: "Role",
+				dataIndex: "role",
+				key: "role",
+				render: (role) => <Tag color="blue">{role}</Tag>,
+			},
+			{
+				title: "Source",
+				dataIndex: "source",
+				key: "source",
+				render: (src) => (
+					<Tag color={src === "upload" ? "purple" : "green"}>{src}</Tag>
+				),
+			},
+			{
+				title: "",
+				key: "action",
+				fixed: "right",
+				width: 90,
+				render: (_, record) => (
+					<Button
+						type="link"
+						danger
+						size="small"
+						onClick={() => removeRow(record.key)}
+					>
+						Remove
+					</Button>
+				),
+			},
+		],
+		[]
+	);
 
 	const totalByRole = useMemo(() => {
 		return preview.reduce(
@@ -262,7 +284,7 @@ const AddBulkUsersPage = () => {
 					locale={{
 						emptyText: "Upload a JSON file or add a user to see the queue",
 					}}
-					scroll={{ x: true }}
+					scroll={{ x: 700, y: 360 }}
 				/>
 			</Card>
 
