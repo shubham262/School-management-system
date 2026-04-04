@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/refs */
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import React, { memo, useRef } from "react";
 import { Provider } from "react-redux";

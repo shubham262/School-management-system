@@ -1,6 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-hooks/immutability */
-/* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
 import EmptyAnnouncements from "@/components/EmptyAnnouncements";
 import LandingLoader from "@/components/Loader";

@@ -17,33 +17,32 @@ const extendedFields = [
 	{ label: "Attendance", key: "attendance", placeholder: "e.g. 95%" },
 ];
 
+const getStoredUser = () => {
+	if (typeof window === "undefined") return null;
+	try {
+		const stored = localStorage.getItem("user");
+		return stored ? JSON.parse(stored) : null;
+	} catch (error) {
+		console.error("Failed to parse user from storage", error);
+		return null;
+	}
+};
+
 const ProfilePage = () => {
-	const [user, setUser] = useState(null);
-	const [formData, setFormData] = useState({});
+	const [user, setUser] = useState(getStoredUser);
+	const [formData, setFormData] = useState(getStoredUser);
 	const [isEditing, setIsEditing] = useState(false);
 
 	const params = useParams();
 	const router = useRouter();
 	const slug = params?.id;
 
-	useEffect(() => {
-		const storedUser = localStorage.getItem("user");
-		if (!storedUser) return;
-		try {
-			const parsed = JSON.parse(storedUser);
-			setUser(parsed);
-			setFormData(parsed);
-		} catch (error) {
-			console.error("Failed to parse user from storage", error);
-		}
-	}, []);
-
 	const initials = useMemo(() => {
 		if (!formData?.name) return "U";
 		const parts = formData.name.split(" ").filter(Boolean);
 		if (parts.length === 1) return parts[0][0]?.toUpperCase();
 		return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
-	}, [formData?.name]);
+	}, [formData]);
 
 	const handleChange = (key, value) => {
 		setFormData((prev) => ({ ...prev, [key]: value }));
