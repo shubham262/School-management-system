@@ -189,26 +189,23 @@ const AnnouncementsPage = () => {
 		[announcements]
 	);
 
-	const filteredAnnouncements = useMemo(() => {
-		if (filterScope === "all") return sortedAnnouncements;
-		return sortedAnnouncements.filter((item) => item.scope === filterScope);
-	}, [sortedAnnouncements, filterScope]);
+const filteredAnnouncements = useMemo(() => {
+	if (filterScope === "all") return sortedAnnouncements;
+	return sortedAnnouncements.filter((item) => item.scope === filterScope);
+}, [sortedAnnouncements, filterScope]);
 
-	useEffect(() => {
-		if (filteredAnnouncements.length === 0) {
-			setActiveId(null);
-			return;
-		}
-		const exists = filteredAnnouncements.some((item) => item.id === activeId);
-		if (!exists) {
-			setActiveId(filteredAnnouncements[0].id);
-		}
-	}, [filteredAnnouncements, activeId]);
+const effectiveActiveId = useMemo(() => {
+	if (filteredAnnouncements.length === 0) return null;
+	if (filteredAnnouncements.some((item) => item.id === activeId)) {
+		return activeId;
+	}
+	return filteredAnnouncements[0].id;
+}, [filteredAnnouncements, activeId]);
 
-	const activeAnnouncement = useMemo(
-		() => filteredAnnouncements.find((a) => a.id === activeId),
-		[filteredAnnouncements, activeId]
-	);
+const activeAnnouncement = useMemo(
+	() => filteredAnnouncements.find((a) => a.id === effectiveActiveId),
+	[filteredAnnouncements, effectiveActiveId]
+);
 
 	return (
 		<div className="max-w-6xl mx-auto space-y-6">
