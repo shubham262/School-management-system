@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
-	Card,
 	Input,
 	Select,
 	Tag,
@@ -76,35 +75,45 @@ const seedTeachers = [
 ];
 
 const TeachersPage = () => {
-	const [teachers, setTeachers] = useState(seedTeachers);
-	const [search, setSearch] = useState("");
-	const [subjectFilter, setSubjectFilter] = useState([]);
-	const [classFilter, setClassFilter] = useState([]);
+	const [info, setInfo] = useState({
+		teachers: seedTeachers,
+		search: "",
+		subjectFilter: [],
+		classFilter: [],
+	});
 
 	const handleRemove = (id) => {
-		setTeachers((prev) => prev.filter((t) => t.id !== id));
+		setInfo((prev) => ({
+			...prev,
+			teachers: prev.teachers.filter((t) => t.id !== id),
+		}));
 		message.success("Teacher removed");
 	};
 
 	const filtered = useMemo(() => {
-		return teachers.filter((t) => {
-			const q = search.trim().toLowerCase();
+		return info.teachers.filter((t) => {
+			const q = info.search.trim().toLowerCase();
 			const matchesSearch =
 				!q ||
 				t.name.toLowerCase().includes(q) ||
 				t.email.toLowerCase().includes(q);
 
 			const matchesSubject =
-				subjectFilter.length === 0 ||
-				subjectFilter.some((sub) => t.subjects.includes(sub));
+				info.subjectFilter.length === 0 ||
+				info.subjectFilter.some((sub) => t.subjects.includes(sub));
 
 			const matchesClass =
-				classFilter.length === 0 ||
-				classFilter.some((cls) => t.classes.includes(cls));
+				info.classFilter.length === 0 ||
+				info.classFilter.some((cls) => t.classes.includes(cls));
 
 			return matchesSearch && matchesSubject && matchesClass;
 		});
-	}, [teachers, search, subjectFilter, classFilter]);
+	}, [
+		info.teachers,
+		info.search,
+		info.subjectFilter,
+		info.classFilter,
+	]);
 
 	const columns = [
 		{ title: "Name", dataIndex: "name", key: "name" },
@@ -157,28 +166,26 @@ const TeachersPage = () => {
 
 	return (
 		<div className="max-w-6xl mx-auto space-y-4">
-			<Card
-				title={
-					<div className="flex items-center gap-2">
+			<div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+				<div className="flex items-center justify-between gap-3 border-b border-slate-100 px-6 py-5">
+					<div className="flex items-center gap-2 text-slate-900">
 						<Users className="w-4 h-4" />
-						<span>Teachers</span>
+						<span className="text-base font-semibold">Teachers</span>
 					</div>
-				}
-				extra={
 					<span className="text-xs text-slate-500">
-						{teachers.length} total
+						{info.teachers.length} total
 					</span>
-				}
-				className="shadow-sm"
-			>
-				<div className="flex flex-col gap-3">
+				</div>
+				<div className="flex flex-col gap-3 px-6 py-5">
 					<div className="flex flex-col md:flex-row gap-3 md:items-center">
 						<Input
 							allowClear
 							prefix={<Search className="w-4 h-4 text-slate-400" />}
 							placeholder="Search by name or email"
-							value={search}
-							onChange={(e) => setSearch(e.target.value)}
+							value={info.search}
+							onChange={(e) =>
+								setInfo((prev) => ({ ...prev, search: e.target.value }))
+							}
 							className="md:max-w-sm"
 						/>
 						<div className="flex items-center gap-2 flex-wrap">
@@ -194,8 +201,10 @@ const TeachersPage = () => {
 								allowClear
 								placeholder="Subjects"
 								options={subjectOptions}
-								value={subjectFilter}
-								onChange={setSubjectFilter}
+								value={info.subjectFilter}
+								onChange={(value) =>
+									setInfo((prev) => ({ ...prev, subjectFilter: value }))
+								}
 								style={{ minWidth: 200 }}
 							/>
 							<Select
@@ -203,15 +212,20 @@ const TeachersPage = () => {
 								allowClear
 								placeholder="Classes"
 								options={classOptions}
-								value={classFilter}
-								onChange={setClassFilter}
+								value={info.classFilter}
+								onChange={(value) =>
+									setInfo((prev) => ({ ...prev, classFilter: value }))
+								}
 								style={{ minWidth: 200 }}
 							/>
 							<Button
 								onClick={() => {
-									setSubjectFilter([]);
-									setClassFilter([]);
-									setSearch("");
+									setInfo((prev) => ({
+										...prev,
+										subjectFilter: [],
+										classFilter: [],
+										search: "",
+									}));
 								}}
 							>
 								Reset
@@ -227,7 +241,7 @@ const TeachersPage = () => {
 						locale={{ emptyText: <Empty description="No teachers found" /> }}
 					/>
 				</div>
-			</Card>
+			</div>
 		</div>
 	);
 };
