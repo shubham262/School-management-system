@@ -1,7 +1,13 @@
-import React from "react";
+import ProfilePage from "@/views/dashboard/Profile";
+import React, { memo } from "react";
 
-const page = () => {
-	return <div>hello</div>;
+export const metadata = {
+	title: "Profile page",
+	description: "User profile information",
 };
 
-export default page;
+const ProfileUi = () => {
+	return <ProfilePage />;
+};
+
+export default memo(ProfileUi);

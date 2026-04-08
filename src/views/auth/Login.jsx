@@ -36,12 +36,12 @@ const Login = () => {
 			setInfo((prev) => ({ ...prev, loading: true }));
 			const response = await login(slug, payload);
 
-			const { data, memebership } = response || {};
+			const { data, membership } = response || {};
 			const { token, user } = data;
 			localStorage.setItem("token", token);
 			localStorage.setItem("user", JSON.stringify(user));
-			localStorage.setItem("membership", JSON.stringify(memebership));
-			router.push(`/${slug}`);
+			localStorage.setItem("membership", JSON.stringify(membership));
+			router.push(`/${slug}/dashboard/profile`);
 
 			setInfo((prev) => ({ ...prev, loading: false }));
 		} catch (error) {

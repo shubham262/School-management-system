@@ -51,9 +51,9 @@ const Sidebar = () => {
 	);
 
 	const handleLogout = useCallback(async () => {
+		await authClient.signOut();
 		localStorage.clear();
 		router.push(`/${slug}/login`);
-		await authClient.signOut();
 	}, [slug, router]);
 
 	return (
