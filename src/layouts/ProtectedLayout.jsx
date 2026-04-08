@@ -1,18 +1,30 @@
+/* eslint-disable react-hooks/immutability */
 "use client";
 import { authClient } from "@/config/authClient";
 import { useParams, useRouter } from "next/navigation";
-import React, { memo, useEffect } from "react";
+import React, { memo, useCallback, useEffect, useRef } from "react";
 
 const Protectedlayout = ({ children }) => {
-	const { data, isPending } = authClient.useSession();
+	const { data, isPending, refetch } = authClient.useSession();
 	const params = useParams();
 	const router = useRouter();
+	const checkRef = useRef(false);
 	const slug = params?.id;
+
 	useEffect(() => {
+		handleAuthCheck();
+	}, []);
+
+	const handleAuthCheck = useCallback(async () => {
 		if (!isPending && !data) {
-			router.push(`/${slug}/login`);
+			if (checkRef.current) {
+				router.push(`/${slug}/login`);
+			} else {
+				await refetch();
+				checkRef.current = true;
+			}
 		}
-	}, [isPending, slug, data, router]);
+	}, [router, slug, isPending, data, refetch]);
 	return <>{children}</>;
 };
 

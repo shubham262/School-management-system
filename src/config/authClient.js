@@ -5,8 +5,13 @@ const token =
 export const authClient = createAuthClient({
 	baseURL: "http://localhost:3001",
 	fetchOptions: {
-		headers: {
-			authorization: `Bearer ${token}`,
+		auth: {
+			type: "Bearer",
+			token: () => {
+				const token =
+					typeof window !== "undefined" ? localStorage.getItem("token") : null;
+				return token;
+			},
 		},
 	},
 });
