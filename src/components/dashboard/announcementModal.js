@@ -1,15 +1,37 @@
 import React from "react";
 import { Button, Form, Input, Modal, Radio, Select } from "antd";
 
-const AnnouncementModal = ({
-	open,
-	editingId,
-	form,
-	initialValues,
-	classOptions,
-	onSubmit,
-	onClose,
-}) => {
+const availableClasses = {
+	Nursery: 1,
+	LKG: 2,
+	UKG: 3,
+	"CLASS 1": 4,
+	"CLASS 2": 5,
+	"CLASS 3": 6,
+	"CLASS 4": 7,
+	"CLASS 5": 8,
+	"CLASS 6": 9,
+	"CLASS 7": 10,
+	"CLASS 8": 11,
+	"CLASS 9": 12,
+	"CLASS 10": 13,
+	"CLASS 11": 14,
+	"CLASS 12": 15,
+};
+
+const classOptions = Object.keys(availableClasses).map((key) => ({
+	label: key,
+	value: key,
+}));
+
+const emptyForm = {
+	tag: "",
+	title: "",
+	description: "",
+	scope: "school",
+	classes: [],
+};
+const AnnouncementModal = ({ open, editingId, form, onSubmit, onClose }) => {
 	return (
 		<Modal
 			title={editingId ? "Edit announcement" : "Add announcement"}
@@ -17,12 +39,11 @@ const AnnouncementModal = ({
 			onCancel={onClose}
 			footer={null}
 			width={720}
-			destroyOnClose
 		>
 			<Form
 				form={form}
 				layout="vertical"
-				initialValues={initialValues}
+				initialValues={emptyForm}
 				onFinish={onSubmit}
 			>
 				<Form.Item

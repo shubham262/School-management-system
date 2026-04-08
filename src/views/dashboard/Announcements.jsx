@@ -14,29 +14,6 @@ import {
 import moment from "moment";
 import AnnouncementModal from "../../components/dashboard/announcementModal";
 
-const availableClasses = {
-	Nursery: 1,
-	LKG: 2,
-	UKG: 3,
-	"CLASS 1": 4,
-	"CLASS 2": 5,
-	"CLASS 3": 6,
-	"CLASS 4": 7,
-	"CLASS 5": 8,
-	"CLASS 6": 9,
-	"CLASS 7": 10,
-	"CLASS 8": 11,
-	"CLASS 9": 12,
-	"CLASS 10": 13,
-	"CLASS 11": 14,
-	"CLASS 12": 15,
-};
-
-const classOptions = Object.keys(availableClasses).map((key) => ({
-	label: key,
-	value: key,
-}));
-
 const demoAnnouncements = [
 	{
 		id: 1,
@@ -70,52 +47,23 @@ const demoAnnouncements = [
 	},
 ];
 
-const emptyForm = {
-	tag: "",
-	title: "",
-	description: "",
-	scope: "school",
-	classes: [],
-};
-
-const getInitialAnnouncements = () => {
-	if (typeof window === "undefined") return demoAnnouncements;
-	try {
-		const stored = localStorage.getItem("announcements");
-		if (stored) {
-			const parsed = JSON.parse(stored);
-			if (Array.isArray(parsed) && parsed.length) {
-				return parsed;
-			}
-		}
-		return demoAnnouncements;
-	} catch (error) {
-		console.error("Failed to load announcements", error);
-		return demoAnnouncements;
-	}
-};
-
 const AnnouncementsPage = () => {
 	const [form] = Form.useForm();
-	const [announcements, setAnnouncements] = useState(getInitialAnnouncements);
-	const [editingId, setEditingId] = useState(null);
-	const [activeId, setActiveId] = useState(
-		getInitialAnnouncements()?.[0]?.id || null
-	);
-	const [modalOpen, setModalOpen] = useState(false);
-	const [filterScope, setFilterScope] = useState("all");
 
-	// Persist announcements
-	useEffect(() => {
-		localStorage.setItem("announcements", JSON.stringify(announcements));
-	}, [announcements]);
+	const [info, setInfo] = useState({
+		announcements: demoAnnouncements,
+		editingId: null,
+		activeId: demoAnnouncements?.[0]?.id || null,
+		modalOpen: false,
+		filterScope: "all",
+	});
 
 	const handleSubmit = (values) => {
 		const payload = {
 			...values,
-			id: editingId || Date.now(),
-			createdAt: editingId
-				? announcements.find((a) => a.id === editingId)?.createdAt
+			id: info?.editingId || Date.now(),
+			createdAt: info?.editingId
+				? info?.announcements.find((a) => a.id === info?.editingId)?.createdAt
 				: Date.now(),
 		};
 
@@ -123,25 +71,37 @@ const AnnouncementsPage = () => {
 			payload.classes = [];
 		}
 
-		if (editingId) {
-			setAnnouncements((prev) =>
-				prev.map((item) => (item.id === editingId ? payload : item))
-			);
+		if (info?.editingId) {
+			setInfo((prev) => ({
+				...prev,
+				announcements: prev?.announcements.map((item) =>
+					item.id === prev?.editingId ? payload : item
+				),
+				activeId: payload.id,
+				editingId: null,
+				modalOpen: false,
+			}));
 			message.success("Announcement updated");
-			setActiveId(payload.id);
 		} else {
-			setAnnouncements((prev) => [payload, ...prev]);
+			setInfo((prev) => ({
+				...prev,
+				announcements: [payload, ...prev?.announcements],
+				activeId: payload.id,
+				editingId: null,
+				modalOpen: false,
+			}));
 			message.success("Announcement added");
-			setActiveId(payload.id);
 		}
 
-		setEditingId(null);
 		form.resetFields();
-		setModalOpen(false);
 	};
 
 	const handleEdit = (item) => {
-		setEditingId(item.id);
+		setInfo((prev) => ({
+			...prev,
+			editingId: item.id,
+			modalOpen: true,
+		}));
 		form.setFieldsValue({
 			tag: item.tag,
 			title: item.title,
@@ -149,46 +109,60 @@ const AnnouncementsPage = () => {
 			scope: item.scope,
 			classes: item.classes || [],
 		});
-		setModalOpen(true);
 	};
 
 	const handleDelete = (id) => {
-		setAnnouncements((prev) => {
-			const next = prev.filter((item) => item.id !== id);
-			const nextActive = activeId === id ? next[0]?.id || null : activeId;
-			setActiveId(nextActive);
-			return next;
+		setInfo((prev) => {
+			const nextAnnouncements = prev?.announcements.filter(
+				(item) => item.id !== id
+			);
+			return {
+				...prev,
+				announcements: nextAnnouncements,
+				activeId:
+					prev?.activeId === id
+						? nextAnnouncements?.[0]?.id || null
+						: prev?.activeId,
+				editingId: prev?.editingId === id ? null : prev?.editingId,
+			};
 		});
 		message.info("Announcement deleted");
-		if (editingId === id) {
-			setEditingId(null);
+		if (info?.editingId === id) {
 			form.resetFields();
 		}
 	};
 
 	const handleModalClose = () => {
-		setModalOpen(false);
-		setEditingId(null);
+		setInfo((prev) => ({
+			...prev,
+			modalOpen: false,
+			editingId: null,
+		}));
 		form.resetFields();
 	};
 
 	const sortedAnnouncements = useMemo(
-		() => [...announcements].sort((a, b) => b.createdAt - a.createdAt),
-		[announcements]
+		() =>
+			[...(info?.announcements || [])].sort(
+				(a, b) => b.createdAt - a.createdAt
+			),
+		[info?.announcements]
 	);
 
 	const filteredAnnouncements = useMemo(() => {
-		if (filterScope === "all") return sortedAnnouncements;
-		return sortedAnnouncements.filter((item) => item.scope === filterScope);
-	}, [sortedAnnouncements, filterScope]);
+		if (info?.filterScope === "all") return sortedAnnouncements;
+		return sortedAnnouncements.filter(
+			(item) => item.scope === info?.filterScope
+		);
+	}, [sortedAnnouncements, info?.filterScope]);
 
 	const effectiveActiveId = useMemo(() => {
 		if (filteredAnnouncements.length === 0) return null;
-		if (filteredAnnouncements.some((item) => item.id === activeId)) {
-			return activeId;
+		if (filteredAnnouncements.some((item) => item.id === info?.activeId)) {
+			return info?.activeId;
 		}
 		return filteredAnnouncements[0].id;
-	}, [filteredAnnouncements, activeId]);
+	}, [filteredAnnouncements, info?.activeId]);
 
 	const activeAnnouncement = useMemo(
 		() => filteredAnnouncements.find((a) => a.id === effectiveActiveId),
@@ -211,16 +185,21 @@ const AnnouncementsPage = () => {
 								{ label: "School", value: "school" },
 								{ label: "Class", value: "class" },
 							]}
-							value={filterScope}
-							onChange={(val) => setFilterScope(val)}
+							value={info?.filterScope}
+							onChange={(val) =>
+								setInfo((prev) => ({ ...prev, filterScope: val }))
+							}
 						/>
 						<Button
 							type="primary"
 							icon={<Plus className="w-4 h-4" />}
 							onClick={() => {
-								setEditingId(null);
+								setInfo((prev) => ({
+									...prev,
+									editingId: null,
+									modalOpen: true,
+								}));
 								form.resetFields();
-								setModalOpen(true);
 							}}
 						>
 							Add announcement
@@ -240,9 +219,11 @@ const AnnouncementsPage = () => {
 								{filteredAnnouncements.map((item) => (
 									<button
 										key={item.id}
-										onClick={() => setActiveId(item.id)}
+										onClick={() =>
+											setInfo((prev) => ({ ...prev, activeId: item.id }))
+										}
 										className={`w-full text-left rounded-xl px-4 py-3 transition-all duration-150 flex flex-col gap-1.5 border ${
-											activeId === item.id
+											info?.activeId === item.id
 												? "bg-blue-50 border-blue-200"
 												: "bg-white border-transparent hover:bg-slate-50 hover:border-slate-200"
 										}`}
@@ -259,7 +240,7 @@ const AnnouncementsPage = () => {
 										</div>
 										<p
 											className={`text-xs font-semibold leading-snug ${
-												activeId === item.id
+												info?.activeId === item.id
 													? "text-blue-800"
 													: "text-slate-700"
 											}`}
@@ -366,11 +347,9 @@ const AnnouncementsPage = () => {
 			</div>
 
 			<AnnouncementModal
-				open={modalOpen}
-				editingId={editingId}
+				open={info?.modalOpen}
+				editingId={info?.editingId}
 				form={form}
-				initialValues={emptyForm}
-				classOptions={classOptions}
 				onSubmit={handleSubmit}
 				onClose={handleModalClose}
 			/>
