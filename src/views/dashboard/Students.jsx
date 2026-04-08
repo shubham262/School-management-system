@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState } from "react";
 import {
-	Card,
 	Input,
 	Select,
 	Tag,
@@ -60,29 +59,34 @@ const seedStudents = [
 ];
 
 const StudentsPage = () => {
-	const [students, setStudents] = useState(seedStudents);
-	const [search, setSearch] = useState("");
-	const [classFilter, setClassFilter] = useState([]);
+	const [info, setInfo] = useState({
+		students: seedStudents,
+		search: "",
+		classFilter: [],
+	});
 
 	const handleRemove = (id) => {
-		setStudents((prev) => prev.filter((s) => s.id !== id));
+		setInfo((prev) => ({
+			...prev,
+			students: prev.students.filter((s) => s.id !== id),
+		}));
 		message.success("Student removed");
 	};
 
 	const filtered = useMemo(() => {
-		return students.filter((s) => {
-			const q = search.trim().toLowerCase();
+		return info.students.filter((s) => {
+			const q = info.search.trim().toLowerCase();
 			const matchesSearch =
 				!q ||
 				s.name.toLowerCase().includes(q) ||
 				s.email.toLowerCase().includes(q);
 
 			const matchesClass =
-				classFilter.length === 0 || classFilter.includes(s.className);
+				info.classFilter.length === 0 || info.classFilter.includes(s.className);
 
 			return matchesSearch && matchesClass;
 		});
-	}, [students, search, classFilter]);
+	}, [info.students, info.search, info.classFilter]);
 
 	const columns = [
 		{ title: "Name", dataIndex: "name", key: "name" },
@@ -115,28 +119,26 @@ const StudentsPage = () => {
 
 	return (
 		<div className="max-w-6xl mx-auto space-y-4">
-			<Card
-				title={
-					<div className="flex items-center gap-2">
+			<div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+				<div className="flex items-center justify-between gap-3 border-b border-slate-100 px-6 py-5">
+					<div className="flex items-center gap-2 text-slate-900">
 						<GraduationCap className="w-4 h-4" />
-						<span>Students</span>
+						<span className="text-base font-semibold">Students</span>
 					</div>
-				}
-				extra={
 					<span className="text-xs text-slate-500">
-						{students.length} total
+						{info.students.length} total
 					</span>
-				}
-				className="shadow-sm"
-			>
-				<div className="flex flex-col gap-3">
+				</div>
+				<div className="flex flex-col gap-3 px-6 py-5">
 					<div className="flex flex-col md:flex-row gap-3 md:items-center">
 						<Input
 							allowClear
 							prefix={<Search className="w-4 h-4 text-slate-400" />}
 							placeholder="Search by name or email"
-							value={search}
-							onChange={(e) => setSearch(e.target.value)}
+							value={info.search}
+							onChange={(e) =>
+								setInfo((prev) => ({ ...prev, search: e.target.value }))
+							}
 							className="md:max-w-sm"
 						/>
 						<div className="flex items-center gap-2 flex-wrap">
@@ -152,14 +154,19 @@ const StudentsPage = () => {
 								allowClear
 								placeholder="Classes"
 								options={classOptions}
-								value={classFilter}
-								onChange={setClassFilter}
+								value={info.classFilter}
+								onChange={(value) =>
+									setInfo((prev) => ({ ...prev, classFilter: value }))
+								}
 								style={{ minWidth: 200 }}
 							/>
 							<Button
 								onClick={() => {
-									setClassFilter([]);
-									setSearch("");
+									setInfo((prev) => ({
+										...prev,
+										classFilter: [],
+										search: "",
+									}));
 								}}
 							>
 								Reset
@@ -170,12 +177,12 @@ const StudentsPage = () => {
 					<Table
 						columns={columns}
 						dataSource={filtered.map((s) => ({ ...s, key: s.id }))}
-						pagination={{ pageSize: 7, size: "small" }}
+						pagination={{ pageSize: 10, size: "small" }}
 						tableLayout="auto"
 						locale={{ emptyText: <Empty description="No students found" /> }}
 					/>
 				</div>
-			</Card>
+			</div>
 		</div>
 	);
 };
