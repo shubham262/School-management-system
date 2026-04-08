@@ -76,6 +76,7 @@ const StudentsPage = () => {
 	const filtered = useMemo(() => {
 		return info.students.filter((s) => {
 			const q = info.search.trim().toLowerCase();
+
 			const matchesSearch =
 				!q ||
 				s.name.toLowerCase().includes(q) ||
