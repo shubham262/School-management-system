@@ -121,7 +121,7 @@ const StudentsPage = () => {
 	return (
 		<div className="max-w-6xl mx-auto space-y-4">
 			<div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-				<div className="flex items-center justify-between gap-3 border-b border-slate-100 px-6 py-5">
+				<div className="flex flex-col gap-2 border-b border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
 					<div className="flex items-center gap-2 text-slate-900">
 						<GraduationCap className="w-4 h-4" />
 						<span className="text-base font-semibold">Students</span>
@@ -130,7 +130,7 @@ const StudentsPage = () => {
 						{info.students.length} total
 					</span>
 				</div>
-				<div className="flex flex-col gap-3 px-6 py-5">
+				<div className="flex flex-col gap-3 px-4 py-4 sm:px-6 sm:py-5">
 					<div className="flex flex-col md:flex-row gap-3 md:items-center">
 						<Input
 							allowClear
@@ -142,10 +142,10 @@ const StudentsPage = () => {
 							}
 							className="md:max-w-sm"
 						/>
-						<div className="flex items-center gap-2 flex-wrap">
+						<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:flex-wrap">
 							<Tag
 								color="geekblue"
-								className="flex items-center gap-1 px-2 py-1 rounded-md border border-blue-100 text-blue-600 bg-blue-50"
+								className="flex w-fit items-center gap-1 px-2 py-1 rounded-md border border-blue-100 text-blue-600 bg-blue-50"
 							>
 								<Filter className="w-3.5 h-3.5" />
 								<span className="text-xs font-medium">Filters</span>
@@ -159,9 +159,11 @@ const StudentsPage = () => {
 								onChange={(value) =>
 									setInfo((prev) => ({ ...prev, classFilter: value }))
 								}
+								className="w-full sm:w-auto"
 								style={{ minWidth: 200 }}
 							/>
 							<Button
+								className="w-full sm:w-auto"
 								onClick={() => {
 									setInfo((prev) => ({
 										...prev,
@@ -175,13 +177,59 @@ const StudentsPage = () => {
 						</div>
 					</div>
 					<Divider className="!my-2" />
-					<Table
-						columns={columns}
-						dataSource={filtered.map((s) => ({ ...s, key: s.id }))}
-						pagination={{ pageSize: 10, size: "small" }}
-						tableLayout="auto"
-						locale={{ emptyText: <Empty description="No students found" /> }}
-					/>
+					<div className="space-y-3 md:hidden">
+						{filtered.length === 0 ? (
+							<div className="rounded-xl border border-dashed border-slate-200 px-4 py-8">
+								<Empty description="No students found" />
+							</div>
+						) : (
+							filtered.map((student) => (
+								<div
+									key={student.id}
+									className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+								>
+									<div className="flex items-start justify-between gap-3">
+										<div className="min-w-0">
+											<p className="text-sm font-semibold text-slate-900">
+												{student.name}
+											</p>
+											<p className="break-all text-sm text-slate-600">
+												{student.email}
+											</p>
+										</div>
+										<Tag color="blue">{student.className}</Tag>
+									</div>
+									<div className="pt-3">
+										<Popconfirm
+											title="Remove this student?"
+											okText="Remove"
+											cancelText="Cancel"
+											onConfirm={() => handleRemove(student.id)}
+										>
+											<Button
+												danger
+												type="default"
+												icon={<Trash2 className="w-4 h-4" />}
+												className="w-full"
+											>
+												Remove
+											</Button>
+										</Popconfirm>
+									</div>
+								</div>
+							))
+						)}
+					</div>
+					<div className="hidden md:block overflow-x-auto">
+						<Table
+							columns={columns}
+							dataSource={filtered.map((s) => ({ ...s, key: s.id }))}
+							pagination={{ pageSize: 10, size: "small" }}
+							tableLayout="auto"
+							scroll={{ x: 640 }}
+							locale={{ emptyText: <Empty description="No students found" /> }}
+						/>
+					</div>
 				</div>
 			</div>
 		</div>

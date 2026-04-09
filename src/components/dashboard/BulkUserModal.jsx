@@ -9,6 +9,7 @@ const BulkUserModal = ({ open, form, roleOptions, onSubmit, onClose }) => {
 			onCancel={onClose}
 			footer={null}
 			destroyOnClose
+			style={{ top: 16 }}
 		>
 			<Form layout="vertical" form={form} onFinish={onSubmit}>
 				<Form.Item

@@ -101,8 +101,8 @@ const ProfilePage = () => {
 
 	return (
 		<div className="max-w-6xl mx-auto space-y-6">
-			<header className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-6 p-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
-				<div className="flex items-center gap-4">
+			<header className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
+				<div className="flex flex-col gap-4 sm:flex-row sm:items-center">
 					<div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xl font-bold">
 						{nameShortner(info?.name || "")}
 					</div>
@@ -118,19 +118,19 @@ const ProfilePage = () => {
 						</p>
 					</div>
 				</div>
-				<div className="flex flex-wrap gap-3">
+				<div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
 					<button
 						onClick={() =>
 							setInfo((prev) => ({ ...prev, isEditing: !prev.isEditing }))
 						}
-						className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
+						className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 sm:w-auto"
 					>
 						<Edit3 className="h-4 w-4" />
 						{info?.isEditing ? "Cancel edit" : "Edit profile"}
 					</button>
 					<button
 						onClick={handleLogout}
-						className="inline-flex items-center gap-2 rounded-lg bg-red-500 text-white px-4 py-2 text-sm font-semibold shadow-sm hover:bg-red-600"
+						className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 sm:w-auto"
 					>
 						<LogOut className="h-4 w-4" />
 						Log out
@@ -139,7 +139,7 @@ const ProfilePage = () => {
 			</header>
 
 			<section className="space-y-4">
-				<div className="flex items-center justify-between">
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 					<div>
 						<p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
 							Account Details
@@ -151,7 +151,7 @@ const ProfilePage = () => {
 					{info?.isEditing && (
 						<button
 							onClick={handleSave}
-							className="inline-flex items-center gap-2 rounded-lg bg-blue-600 text-white px-4 py-2 text-sm font-semibold shadow-sm hover:bg-blue-700"
+							className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 sm:w-auto"
 						>
 							Save changes
 						</button>

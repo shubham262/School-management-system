@@ -172,7 +172,7 @@ const AnnouncementsPage = () => {
 	return (
 		<div className="max-w-6xl mx-auto space-y-6">
 			<div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-				<div className="flex flex-col gap-4 border-b border-slate-100 px-6 py-5 md:flex-row md:items-center md:justify-between">
+				<div className="flex flex-col gap-4 border-b border-slate-100 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6 md:py-5">
 					<div className="flex items-center gap-2 text-slate-900">
 						<Bell className="w-4 h-4" />
 						<span className="text-base font-semibold">Announcements</span>
@@ -180,6 +180,7 @@ const AnnouncementsPage = () => {
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
 						<Segmented
 							size="middle"
+							block
 							options={[
 								{ label: "All", value: "all" },
 								{ label: "School", value: "school" },
@@ -193,6 +194,7 @@ const AnnouncementsPage = () => {
 						<Button
 							type="primary"
 							icon={<Plus className="w-4 h-4" />}
+							className="w-full sm:w-auto"
 							onClick={() => {
 								setInfo((prev) => ({
 									...prev,
@@ -206,7 +208,7 @@ const AnnouncementsPage = () => {
 						</Button>
 					</div>
 				</div>
-				<div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-slate-100">
+				<div className="flex flex-col divide-y divide-slate-100 md:flex-row md:divide-x md:divide-y-0">
 					{filteredAnnouncements.length === 0 ? (
 						<div className="py-10 flex flex-col items-center text-slate-400 gap-2 w-full">
 							<Bell className="w-10 h-10" />
@@ -215,7 +217,7 @@ const AnnouncementsPage = () => {
 					) : (
 						<>
 							{/* left list */}
-							<div className="md:w-[260px] shrink-0 p-3 space-y-1.5 overflow-y-auto max-h-[420px]">
+							<div className="space-y-1.5 overflow-y-auto p-3 md:max-h-[420px] md:w-[260px] md:shrink-0">
 								{filteredAnnouncements.map((item) => (
 									<button
 										key={item.id}
@@ -252,7 +254,7 @@ const AnnouncementsPage = () => {
 							</div>
 
 							{/* right detail */}
-							<div className="flex-1 p-6 flex flex-col gap-3">
+							<div className="flex flex-1 flex-col gap-3 p-4 sm:p-6">
 								{!activeAnnouncement ? (
 									<div className="flex flex-col items-center justify-center h-full py-10 text-center">
 										<Megaphone className="w-8 h-8 text-slate-300 mb-3" />
@@ -262,7 +264,7 @@ const AnnouncementsPage = () => {
 									</div>
 								) : (
 									<>
-										<div className="flex items-start justify-between gap-3">
+										<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 											<div className="flex items-center gap-2 flex-wrap">
 												<span
 													className={`text-xs font-semibold px-2.5 py-1 rounded-full 
@@ -315,10 +317,11 @@ const AnnouncementsPage = () => {
 											{activeAnnouncement.description}
 										</p>
 
-										<div className="flex gap-3 pt-2">
+										<div className="flex flex-col gap-3 pt-2 sm:flex-row">
 											<Button
 												type="default"
 												icon={<Edit3 className="w-4 h-4" />}
+												className="w-full sm:w-auto"
 												onClick={() => handleEdit(activeAnnouncement)}
 											>
 												Edit
@@ -333,6 +336,7 @@ const AnnouncementsPage = () => {
 													type="primary"
 													danger
 													icon={<Trash2 className="w-4 h-4" />}
+													className="w-full sm:w-auto"
 												>
 													Delete
 												</Button>

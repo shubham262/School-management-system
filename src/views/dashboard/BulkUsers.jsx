@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import {
 	Alert,
 	Button,
+	Empty,
 	Form,
 	Table,
 	Tag,
@@ -188,7 +189,7 @@ const AddBulkUsersPage = () => {
 
 	return (
 		<div className="max-w-6xl mx-auto space-y-6">
-			<div className="flex items-start gap-4 flex-wrap">
+			<div className="flex flex-col gap-4 lg:flex-row lg:items-start">
 				<div className="flex-1 min-w-[260px]">
 					<Title level={3} className="!mb-1">
 						Bulk Add Users
@@ -205,7 +206,7 @@ const AddBulkUsersPage = () => {
 						message="Backend will create all users from the uploaded payload. JSON should be an array of objects with name, email, role."
 					/>
 				</div>
-				<div className="min-w-[260px] rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+				<div className="w-full min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:w-[320px] lg:shrink-0">
 					<div className="flex items-center gap-3">
 						<FileJson2 className="w-8 h-8 text-blue-600" />
 						<div>
@@ -222,7 +223,7 @@ const AddBulkUsersPage = () => {
 			</div>
 
 			<div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-				<div className="flex flex-col gap-3 border-b border-slate-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+				<div className="flex flex-col gap-3 border-b border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
 					<span className="flex items-center gap-2 text-base font-semibold text-slate-900">
 						<UploadCloud className="w-4 h-4" />
 						Bulk JSON Upload
@@ -234,7 +235,7 @@ const AddBulkUsersPage = () => {
 						Add single user
 					</Button>
 				</div>
-				<div className="px-6 py-5">
+				<div className="px-4 py-4 sm:px-6 sm:py-5">
 					<Dragger
 						name="file"
 						maxCount={1}
@@ -264,7 +265,7 @@ const AddBulkUsersPage = () => {
 			</div>
 
 			<div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-				<div className="flex flex-col gap-3 border-b border-slate-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+				<div className="flex flex-col gap-3 border-b border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
 					<span className="text-base font-semibold text-slate-900">
 						Queued Users
 					</span>
@@ -276,7 +277,7 @@ const AddBulkUsersPage = () => {
 						Send to backend
 					</Button>
 				</div>
-				<div className="px-6 py-5">
+				<div className="px-4 py-4 sm:px-6 sm:py-5">
 					<div className="flex flex-wrap gap-3 mb-3">
 						<Tag color="blue">Total: {info.preview.length}</Tag>
 						{Object.entries(totalByRole).map(([role, count]) => (
@@ -285,15 +286,56 @@ const AddBulkUsersPage = () => {
 							</Tag>
 						))}
 					</div>
-					<Table
-						columns={columns}
-						dataSource={info.preview}
-						pagination={{ pageSize: 5, size: "small" }}
-						locale={{
-							emptyText: "Upload a JSON file or add a user to see the queue",
-						}}
-						scroll={{ x: 700, y: 360 }}
-					/>
+					<div className="space-y-3 md:hidden">
+						{info.preview.length === 0 ? (
+							<div className="rounded-xl border border-dashed border-slate-200 px-4 py-8">
+								<Empty description="Upload a JSON file or add a user to see the queue" />
+							</div>
+						) : (
+							info.preview.map((user) => (
+								<div
+									key={user.key}
+									className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+								>
+									<div className="space-y-3">
+										<div>
+											<p className="text-sm font-semibold text-slate-900">
+												{user.name}
+											</p>
+											<p className="break-all text-sm text-slate-600">
+												{user.email}
+											</p>
+										</div>
+										<div className="flex flex-wrap gap-2">
+											<Tag color="blue">{user.role}</Tag>
+											<Tag color={user.source === "upload" ? "purple" : "green"}>
+												{user.source}
+											</Tag>
+										</div>
+										<Button
+											type="default"
+											danger
+											className="w-full"
+											onClick={() => removeRow(user.key)}
+										>
+											Remove
+										</Button>
+									</div>
+								</div>
+							))
+						)}
+					</div>
+					<div className="hidden md:block overflow-x-auto">
+						<Table
+							columns={columns}
+							dataSource={info.preview}
+							pagination={{ pageSize: 5, size: "small" }}
+							locale={{
+								emptyText: "Upload a JSON file or add a user to see the queue",
+							}}
+							scroll={{ x: 700, y: 360 }}
+						/>
+					</div>
 				</div>
 			</div>
 

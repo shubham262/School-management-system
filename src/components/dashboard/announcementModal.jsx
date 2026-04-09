@@ -39,6 +39,8 @@ const AnnouncementModal = ({ open, editingId, form, onSubmit, onClose }) => {
 			onCancel={onClose}
 			footer={null}
 			width={720}
+			style={{ top: 16 }}
+			styles={{ body: { paddingTop: 12 } }}
 		>
 			<Form
 				form={form}
