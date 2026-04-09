@@ -1,4 +1,3 @@
-import ProfilePage from "@/views/dashboard/Profile";
 import StudentsPage from "@/views/dashboard/Students";
 import React, { memo } from "react";
 

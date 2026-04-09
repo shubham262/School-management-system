@@ -1,0 +1,49 @@
+[
+	{
+		"name": "Aarav Sharma",
+		"email": "aarav.sharma.admin01@example.com",
+		"role": "admin"
+	},
+	{
+		"name": "Diya Verma",
+		"email": "diya.verma.student01@example.com",
+		"role": "student",
+		"profileInformation": {
+			"class": "CLASS 8",
+			"rollNumber": "08-017",
+			"phoneNumber": "9876501201"
+		}
+	},
+	{
+		"name": "Kabir Mehta",
+		"email": "kabir.mehta.student02@example.com",
+		"role": "student",
+		"profileInformation": {
+			"class": "CLASS 10",
+			"rollNumber": "10-021",
+			"phoneNumber": "9876501202"
+		}
+	},
+	{
+		"name": "Sneha Iyer",
+		"email": "sneha.iyer.teacher01@example.com",
+		"role": "teacher",
+		"profileInformation": {
+			"subjects": ["Mathematics", "Physics"],
+			"classes": ["CLASS 9", "CLASS 10"],
+			"classTeacher": ["CLASS 9"],
+			"phoneNumber": "9876502201"
+		}
+	},
+	{
+		"name": "Rohan Nair",
+		"email": "rohan.nair.teacher02@example.com",
+		"role": "teacher",
+		"profileInformation": {
+			"subjects": ["English", "History"],
+			"classes": ["CLASS 6", "CLASS 7"],
+			"classTeacher": ["CLASS 7"],
+			"phoneNumber": "9876502202"
+		}
+	}
+]
