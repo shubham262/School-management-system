@@ -6,9 +6,6 @@ import {
 	Alert,
 	Button,
 	Form,
-	Input,
-	Modal,
-	Select,
 	Table,
 	Tag,
 	Typography,
@@ -16,6 +13,7 @@ import {
 	message,
 } from "antd";
 import { UploadCloud, Info, FileJson2, UserPlus, Send } from "lucide-react";
+import BulkUserModal from "@/components/dashboard/BulkUserModal";
 
 const { Paragraph, Text, Title } = Typography;
 const { Dragger } = Upload;
@@ -299,50 +297,13 @@ const AddBulkUsersPage = () => {
 				</div>
 			</div>
 
-			<Modal
-				title="Add single user"
+			<BulkUserModal
 				open={info.modalOpen}
-				onCancel={() => setInfo((prev) => ({ ...prev, modalOpen: false }))}
-				footer={null}
-				destroyOnClose
-			>
-				<Form layout="vertical" form={form} onFinish={handleSingleSubmit}>
-					<Form.Item
-						name="name"
-						label="Name"
-						rules={[{ required: true, message: "Name is required" }]}
-					>
-						<Input placeholder="Enter full name" />
-					</Form.Item>
-					<Form.Item
-						name="email"
-						label="Email"
-						rules={[
-							{ required: true, message: "Email is required" },
-							{ type: "email", message: "Enter a valid email" },
-						]}
-					>
-						<Input placeholder="user@example.com" />
-					</Form.Item>
-					<Form.Item
-						name="role"
-						label="Role"
-						rules={[{ required: true, message: "Role is required" }]}
-					>
-						<Select options={roleOptions} placeholder="Select role" />
-					</Form.Item>
-					<div className="flex gap-2 justify-end">
-						<Button
-							onClick={() => setInfo((prev) => ({ ...prev, modalOpen: false }))}
-						>
-							Cancel
-						</Button>
-						<Button type="primary" htmlType="submit">
-							Add to queue
-						</Button>
-					</div>
-				</Form>
-			</Modal>
+				form={form}
+				roleOptions={roleOptions}
+				onSubmit={handleSingleSubmit}
+				onClose={() => setInfo((prev) => ({ ...prev, modalOpen: false }))}
+			/>
 		</div>
 	);
 };
