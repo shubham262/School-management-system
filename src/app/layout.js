@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono, Poppins, Inter, Roboto } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "@/redux/Provider";
+import AntdProvider from "@/layouts/AntdProvider";
 const roboto = Roboto({
 	weight: "400",
 	subsets: ["latin"],
@@ -35,7 +36,9 @@ export default function RootLayout({ children }) {
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} ${roboto.className} ${inter.className} ${roboto.poppins} antialiased`}
 			>
-				<StoreProvider>{children}</StoreProvider>
+				<AntdProvider>
+					<StoreProvider>{children}</StoreProvider>
+				</AntdProvider>
 			</body>
 		</html>
 	);

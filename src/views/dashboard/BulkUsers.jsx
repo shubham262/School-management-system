@@ -308,7 +308,9 @@ const AddBulkUsersPage = () => {
 										</div>
 										<div className="flex flex-wrap gap-2">
 											<Tag color="blue">{user.role}</Tag>
-											<Tag color={user.source === "upload" ? "purple" : "green"}>
+											<Tag
+												color={user.source === "upload" ? "purple" : "green"}
+											>
 												{user.source}
 											</Tag>
 										</div>

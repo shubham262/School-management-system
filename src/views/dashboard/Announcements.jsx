@@ -180,7 +180,6 @@ const AnnouncementsPage = () => {
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
 						<Segmented
 							size="middle"
-							block
 							options={[
 								{ label: "All", value: "all" },
 								{ label: "School", value: "school" },

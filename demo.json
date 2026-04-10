@@ -10,7 +10,7 @@
 		"role": "student",
 		"profileInformation": {
 			"class": "CLASS 8",
-			"rollNumber": "08-017",
+			"rollNumber": "08",
 			"phoneNumber": "9876501201"
 		}
 	},
@@ -20,7 +20,7 @@
 		"role": "student",
 		"profileInformation": {
 			"class": "CLASS 10",
-			"rollNumber": "10-021",
+			"rollNumber": "10",
 			"phoneNumber": "9876501202"
 		}
 	},
