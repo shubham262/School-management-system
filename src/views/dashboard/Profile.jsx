@@ -7,6 +7,8 @@ import { LogOut, Mail, ShieldCheck, UserRound, Edit3 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { nameShortner } from "@/helper";
 import { authClient } from "@/config/authClient";
+import { updateUserInformation } from "@/service/auth";
+import { message } from "antd";
 
 const baseFields = [
 	{ label: "Name", key: "name", icon: UserRound, editable: true },
@@ -57,9 +59,23 @@ const ProfilePage = () => {
 		setInfo((prev) => ({ ...prev, [key]: value }));
 	};
 
-	const handleSave = () => {
-		setInfo((prev) => ({ ...prev, isEditing: false }));
-	};
+	const handleSave = useCallback(async () => {
+		try {
+			const payload = {
+				payloadForUpdate: {
+					name: info?.name,
+				},
+			};
+			const { user } = await updateUserInformation(slug, payload);
+			if (user) {
+				localStorage.setItem("user", JSON.stringify(user));
+			}
+			setInfo((prev) => ({ ...prev, isEditing: false }));
+		} catch (error) {
+			console.log("error==>", error);
+			message.error("Error updating user information , try again");
+		}
+	}, [info?.name]);
 
 	const handleLogout = useCallback(async () => {
 		await authClient.signOut();

@@ -30,10 +30,10 @@ export const updateSchoolInformation = async (slug, payload) => {
 	}
 };
 
-export const fetchSchoolAnnouncements = async (slug) => {
+export const fetchSchoolAnnouncements = async (slug, query = false) => {
 	try {
 		const { data } = await api.get(
-			`/announcement/${slug}/fetch-school-announcement`
+			`/announcement/${slug}/fetch-school-announcement?all=${query}`
 		);
 		return data;
 	} catch (error) {
@@ -44,6 +44,53 @@ export const fetchSchoolAnnouncements = async (slug) => {
 export const login = async (slug, payload) => {
 	try {
 		const { data } = await api.post(`/auth/${slug}/sign-in`, payload);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const updateUserInformation = async (slug, payload) => {
+	try {
+		const { data } = await api.put(
+			`/auth/${slug}/updateUserInformation`,
+			payload
+		);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const deleteAnnouncements = async (slug, annoucementId) => {
+	try {
+		const { data } = await api.delete(
+			`/announcement/${slug}/deleteAnnouncement/${annoucementId}`
+		);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const createAnnouncements = async (slug, payload) => {
+	try {
+		const { data } = await api.post(
+			`/announcement/${slug}/create-school-announcement`,
+			payload
+		);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const updateAnnouncements = async (slug, annoucementId, payload) => {
+	try {
+		const { data } = await api.put(
+			`/announcement/${slug}/update-announcement/${annoucementId}`,
+			payload
+		);
 		return data;
 	} catch (error) {
 		throw error;

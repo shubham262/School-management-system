@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/immutability */
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Bell, Megaphone, Edit3, Plus, Trash2, BookOpen } from "lucide-react";
 import {
 	Button,
@@ -13,6 +14,13 @@ import {
 } from "antd";
 import moment from "moment";
 import AnnouncementModal from "../../components/dashboard/announcementModal";
+import { useParams } from "next/navigation";
+import {
+	createAnnouncements,
+	deleteAnnouncements,
+	fetchSchoolAnnouncements,
+	updateAnnouncements,
+} from "@/service/auth";
 
 const demoAnnouncements = [
 	{
@@ -48,58 +56,95 @@ const demoAnnouncements = [
 ];
 
 const AnnouncementsPage = () => {
+	const params = useParams();
+	const slug = params?.id;
 	const [form] = Form.useForm();
 
 	const [info, setInfo] = useState({
-		announcements: demoAnnouncements,
+		announcements: [],
 		editingId: null,
-		activeId: demoAnnouncements?.[0]?.id || null,
+		activeId: null,
 		modalOpen: false,
 		filterScope: "all",
 	});
 
-	const handleSubmit = (values) => {
-		const payload = {
-			...values,
-			id: info?.editingId || Date.now(),
-			createdAt: info?.editingId
-				? info?.announcements.find((a) => a.id === info?.editingId)?.createdAt
-				: Date.now(),
-		};
+	useEffect(() => {
+		fetchAnnouncement();
+	}, []);
 
-		if (payload.scope === "school") {
-			payload.classes = [];
-		}
-
-		if (info?.editingId) {
+	const fetchAnnouncement = useCallback(async () => {
+		try {
+			const { schoolAnnoucements = [] } = await fetchSchoolAnnouncements(
+				slug,
+				true
+			);
 			setInfo((prev) => ({
 				...prev,
-				announcements: prev?.announcements.map((item) =>
-					item.id === prev?.editingId ? payload : item
-				),
-				activeId: payload.id,
-				editingId: null,
-				modalOpen: false,
+				announcements: schoolAnnoucements,
+				activeId: schoolAnnoucements?.length
+					? schoolAnnoucements?.[0]?._id
+					: null,
 			}));
-			message.success("Announcement updated");
-		} else {
-			setInfo((prev) => ({
-				...prev,
-				announcements: [payload, ...prev?.announcements],
-				activeId: payload.id,
-				editingId: null,
-				modalOpen: false,
-			}));
-			message.success("Announcement added");
+		} catch (error) {
+			message.error("Error fetching announcements");
 		}
 
-		form.resetFields();
-	};
+		console.log("response", response);
+	}, [slug]);
+
+	const handleSubmit = useCallback(
+		async (values) => {
+			const payload = {
+				payloadForUpdate: {
+					...values,
+				},
+			};
+
+			if (payload.scope === "school") {
+				payload.classes = [];
+			}
+
+			if (info?.editingId) {
+				const { data } = await updateAnnouncements(
+					slug,
+					info?.editingId,
+					payload
+				);
+
+				setInfo((prev) => ({
+					...prev,
+					announcements: prev?.announcements.map((item) =>
+						item._id === prev?.editingId ? data : item
+					),
+					editingId: null,
+					modalOpen: false,
+				}));
+				message.success("Announcement updated");
+			} else {
+				const payloadForCreate = {
+					...values,
+				};
+				const { data } = await createAnnouncements(slug, payloadForCreate);
+
+				setInfo((prev) => ({
+					...prev,
+					announcements: [data, ...prev?.announcements],
+					activeId: data?._id,
+					editingId: null,
+					modalOpen: false,
+				}));
+				message.success("Announcement added");
+			}
+
+			form.resetFields();
+		},
+		[form, info?.editingId, info?.announcements, slug]
+	);
 
 	const handleEdit = (item) => {
 		setInfo((prev) => ({
 			...prev,
-			editingId: item.id,
+			editingId: item._id,
 			modalOpen: true,
 		}));
 		form.setFieldsValue({
@@ -111,26 +156,35 @@ const AnnouncementsPage = () => {
 		});
 	};
 
-	const handleDelete = (id) => {
-		setInfo((prev) => {
-			const nextAnnouncements = prev?.announcements.filter(
-				(item) => item.id !== id
-			);
-			return {
-				...prev,
-				announcements: nextAnnouncements,
-				activeId:
-					prev?.activeId === id
-						? nextAnnouncements?.[0]?.id || null
-						: prev?.activeId,
-				editingId: prev?.editingId === id ? null : prev?.editingId,
-			};
-		});
-		message.info("Announcement deleted");
-		if (info?.editingId === id) {
-			form.resetFields();
-		}
-	};
+	const handleDelete = useCallback(
+		async (id) => {
+			try {
+				const response = await deleteAnnouncements(slug, info?.activeId);
+				console.log("response", response);
+				setInfo((prev) => {
+					const nextAnnouncements = prev?.announcements.filter(
+						(item) => item._id !== id
+					);
+					return {
+						...prev,
+						announcements: nextAnnouncements,
+						activeId:
+							prev?.activeId === id
+								? nextAnnouncements?.[0]?._id || null
+								: prev?.activeId,
+						editingId: prev?.editingId === id ? null : prev?.editingId,
+					};
+				});
+				message.info("Announcement deleted");
+				if (info?.editingId === id) {
+					form.resetFields();
+				}
+			} catch (error) {
+				message.error("Error fetching announcements");
+			}
+		},
+		[slug, form, info?.editingId, info?.activeId]
+	);
 
 	const handleModalClose = () => {
 		setInfo((prev) => ({
@@ -158,14 +212,14 @@ const AnnouncementsPage = () => {
 
 	const effectiveActiveId = useMemo(() => {
 		if (filteredAnnouncements.length === 0) return null;
-		if (filteredAnnouncements.some((item) => item.id === info?.activeId)) {
+		if (filteredAnnouncements.some((item) => item._id === info?.activeId)) {
 			return info?.activeId;
 		}
-		return filteredAnnouncements[0].id;
+		return filteredAnnouncements[0]._id;
 	}, [filteredAnnouncements, info?.activeId]);
 
 	const activeAnnouncement = useMemo(
-		() => filteredAnnouncements.find((a) => a.id === effectiveActiveId),
+		() => filteredAnnouncements.find((a) => a._id === effectiveActiveId),
 		[filteredAnnouncements, effectiveActiveId]
 	);
 
@@ -219,12 +273,12 @@ const AnnouncementsPage = () => {
 							<div className="space-y-1.5 overflow-y-auto p-3 md:max-h-[420px] md:w-[260px] md:shrink-0">
 								{filteredAnnouncements.map((item) => (
 									<button
-										key={item.id}
+										key={item._id}
 										onClick={() =>
 											setInfo((prev) => ({ ...prev, activeId: item.id }))
 										}
 										className={`w-full text-left rounded-xl px-4 py-3 transition-all duration-150 flex flex-col gap-1.5 border ${
-											info?.activeId === item.id
+											info?.activeId === item._id
 												? "bg-blue-50 border-blue-200"
 												: "bg-white border-transparent hover:bg-slate-50 hover:border-slate-200"
 										}`}
@@ -241,7 +295,7 @@ const AnnouncementsPage = () => {
 										</div>
 										<p
 											className={`text-xs font-semibold leading-snug ${
-												info?.activeId === item.id
+												info?.activeId === item._id
 													? "text-blue-800"
 													: "text-slate-700"
 											}`}
@@ -329,7 +383,7 @@ const AnnouncementsPage = () => {
 												title="Delete this announcement?"
 												okText="Delete"
 												cancelText="Cancel"
-												onConfirm={() => handleDelete(activeAnnouncement.id)}
+												onConfirm={() => handleDelete(activeAnnouncement._id)}
 											>
 												<Button
 													type="primary"
