@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import {
 	Alert,
@@ -15,6 +15,7 @@ import {
 } from "antd";
 import { UploadCloud, Info, FileJson2, UserPlus, Send } from "lucide-react";
 import BulkUserModal from "@/components/dashboard/BulkUserModal";
+import { createUsersinBulk } from "@/service/auth";
 
 const { Paragraph, Text, Title } = Typography;
 const { Dragger } = Upload;
@@ -99,6 +100,7 @@ const AddBulkUsersPage = () => {
 			const name = item?.name?.trim();
 			const email = item?.email?.trim();
 			const role = item?.role?.trim?.().toLowerCase?.();
+			const profile = item?.profileInformation || {};
 
 			if (!name || !email || !role) {
 				errors.push(`Row ${index + 1}: name, email, role required`);
@@ -115,6 +117,7 @@ const AddBulkUsersPage = () => {
 				email,
 				role,
 				source,
+				profile,
 			});
 		});
 
@@ -171,21 +174,28 @@ const AddBulkUsersPage = () => {
 		form.resetFields();
 	};
 
-	const handleSendToBackend = async () => {
+	const handleSendToBackend = useCallback(async () => {
 		if (!info.preview.length) {
 			message.warning("Add at least one user first");
 			return;
 		}
 
-		// Placeholder for backend integration
+		const payload = {
+			users: info?.preview || [],
+		};
+		const { data } = await createUsersinBulk(slug, payload);
+		console.log("response", response);
+
 		message.loading({ content: "Sending to backend...", key: "bulk" });
 		setTimeout(() => {
 			message.success({
 				content: "Backend will create the users from uploaded list",
 				key: "bulk",
 			});
+
+			setInfo((prev) => ({ ...prev, preview: [] }));
 		}, 600);
-	};
+	}, [info?.preview, slug]);
 
 	return (
 		<div className="max-w-6xl mx-auto space-y-6">

@@ -96,3 +96,12 @@ export const updateAnnouncements = async (slug, annoucementId, payload) => {
 		throw error;
 	}
 };
+
+export const createUsersinBulk = async (slug, payload) => {
+	try {
+		const { data } = await api.post(`/auth/${slug}/add-bulk-user`, payload);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
