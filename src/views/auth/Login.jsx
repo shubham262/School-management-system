@@ -38,9 +38,13 @@ const Login = () => {
 
 			const { data, membership } = response || {};
 			const { token, user } = data;
+
 			localStorage.setItem("token", token);
 			localStorage.setItem("user", JSON.stringify(user));
 			localStorage.setItem("membership", JSON.stringify(membership));
+			if (user?.changePasswordRequired) {
+				return router.push(`/${slug}/forgot-password`);
+			}
 			router.push(`/${slug}/dashboard/profile`);
 
 			setInfo((prev) => ({ ...prev, loading: false }));

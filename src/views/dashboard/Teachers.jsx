@@ -68,14 +68,12 @@ const TeachersPage = () => {
 	});
 
 	useEffect(() => {
-		handeFetchTeachers();
-	}, [
-		info?.search,
-		info?.subjectFilter,
-		info?.classFilter,
-		info?.subjectFilter,
-		info?.page,
-	]);
+		const timeout = setTimeout(() => {
+			handeFetchTeachers();
+		}, 500);
+
+		return () => clearTimeout(timeout);
+	}, [info?.search, info?.subjectFilter, info?.classFilter, info?.page]);
 
 	const handeFetchTeachers = useCallback(async () => {
 		try {
@@ -308,11 +306,19 @@ const TeachersPage = () => {
 						<Table
 							columns={columns}
 							dataSource={info?.teachers.map((t) => ({ ...t, key: t._id }))}
-							pagination={{ pageSize: info?.total, size: "small" }}
+							pagination={{
+								pageSize: info?.limit,
+								size: "small",
+								current: info?.page,
+								total: info?.total,
+							}}
 							tableLayout="auto"
 							scroll={{ x: 820 }}
 							locale={{ emptyText: <Empty description="No teachers found" /> }}
 							loading={info?.loading}
+							onChange={(page) =>
+								setInfo((prev) => ({ ...prev, page: page?.current }))
+							}
 						/>
 					</div>
 				</div>

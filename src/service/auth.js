@@ -151,3 +151,12 @@ export const removeUsersFromSchool = async (slug, userId) => {
 		throw error;
 	}
 };
+
+export const updatePassword = async (slug, payload) => {
+	try {
+		const { data } = await api.put(`/auth/${slug}/change-password`, payload);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};

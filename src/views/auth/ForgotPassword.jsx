@@ -1,10 +1,51 @@
+/* eslint-disable react-hooks/preserve-manual-memoization */
+"use client";
+import { updatePassword } from "@/service/auth";
+import { message } from "antd";
+
 import { MoveLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { memo } from "react";
+import { useParams, useRouter } from "next/navigation";
+
+import React, { memo, useCallback, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 
 const ForgotPassword = () => {
+	const params = useParams();
+	const router = useRouter();
+	const slug = params?.id;
+	const [info, setInfo] = useState({
+		old: "",
+		new: "",
+		confirm: "",
+	});
+
+	const handleOnChange = useCallback((key, value) => {
+		setInfo((prev) => ({ ...prev, [key]: value }));
+	}, []);
+
+	const handleChangePassword = useCallback(async () => {
+		try {
+			if (!info?.old || !info?.new || !info?.confirm) {
+				return message.error("Please add all the valid values");
+			}
+
+			if (info?.new !== info?.confirm) {
+				return message.error("New Password should be equal to confirmPassword");
+			}
+
+			const payload = {
+				currentPassword: info?.old,
+				newPassword: info?.new,
+			};
+			const response = await updatePassword(slug, payload);
+			return router.push(`/${slug}/login`);
+		} catch (error) {
+			console.log("error", error);
+			message.error("Something went wrong");
+		}
+	}, [info?.new, router, slug, info?.old, info?.confirm]);
 	return (
 		<div className="w-screen  min-h-screen bg-slate-100 flex justify-center items-center p-4 overflow-y-auto">
 			<div className="w-full max-w-md rounded-2xl overflow-hidden bg-white shadow-md">
@@ -26,12 +67,14 @@ const ForgotPassword = () => {
 						Back
 					</Link>
 					<h1 className="my-4 font-semibold text-2xl text-slate-900">
-						Forgot Password
+						Change Password
 					</h1>
 					<div className="flex flex-col">
 						<label className="text-sm mb-1 text-slate-700">Old Password</label>
 						<input
 							type="password"
+							value={info?.old}
+							onChange={(e) => handleOnChange("old", e.target.value)}
 							placeholder="Enter Your Old Password"
 							className="w-full rounded-lg outline-none  border border-slate-300 px-3 py-2  text-sm focus:border-slate-500 mb-5"
 						/>
@@ -40,6 +83,8 @@ const ForgotPassword = () => {
 						<label className="text-sm mb-1 text-slate-700">New Password</label>
 						<input
 							type="password"
+							value={info?.new}
+							onChange={(e) => handleOnChange("new", e.target.value)}
 							placeholder="Enter Your New Password"
 							className="w-full rounded-lg outline-none  border border-slate-300 px-3 py-2  text-sm focus:border-slate-500 mb-5"
 						/>
@@ -51,12 +96,17 @@ const ForgotPassword = () => {
 						</label>
 						<input
 							type="password"
+							value={info?.confirm}
+							onChange={(e) => handleOnChange("confirm", e.target.value)}
 							placeholder="Confirm Password"
 							className="w-full rounded-lg outline-none  border border-slate-300 px-3 py-2  text-sm focus:border-slate-500 mb-5"
 						/>
 					</div>
 
-					<button className="w-full rounded-lg bg-blue-600 px-4 py-2.5 cursor-pointer text-sm text-white font-medium hover:bg-blue-700">
+					<button
+						onClick={handleChangePassword}
+						className="w-full rounded-lg bg-blue-600 px-4 py-2.5 cursor-pointer text-sm text-white font-medium hover:bg-blue-700"
+					>
 						Change Password
 					</button>
 				</div>

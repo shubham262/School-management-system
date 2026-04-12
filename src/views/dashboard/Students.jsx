@@ -54,8 +54,12 @@ const StudentsPage = () => {
 	});
 
 	useEffect(() => {
-		handeFetchStudents();
-	}, [info?.search, info?.classFilter]);
+		const timeout = setTimeout(() => {
+			handeFetchStudents();
+		}, 500);
+
+		return () => clearTimeout(timeout);
+	}, [info?.search, info?.classFilter, info?.page]);
 
 	const handleRemove = async (id) => {
 		try {
@@ -228,11 +232,19 @@ const StudentsPage = () => {
 						<Table
 							columns={columns}
 							dataSource={info?.students.map((s) => ({ ...s, key: s._id }))}
-							pagination={{ pageSize: info?.total, size: "small" }}
+							pagination={{
+								pageSize: info?.limit,
+								size: "small",
+								current: info?.page,
+								total: info?.total,
+							}}
 							tableLayout="auto"
 							scroll={{ x: 640 }}
 							locale={{ emptyText: <Empty description="No students found" /> }}
 							loading={info?.loading}
+							onChange={(page) =>
+								setInfo((prev) => ({ ...prev, page: page?.current }))
+							}
 						/>
 					</div>
 				</div>
