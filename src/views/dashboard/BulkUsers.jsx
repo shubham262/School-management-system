@@ -184,7 +184,6 @@ const AddBulkUsersPage = () => {
 			users: info?.preview || [],
 		};
 		const { data } = await createUsersinBulk(slug, payload);
-		console.log("response", response);
 
 		message.loading({ content: "Sending to backend...", key: "bulk" });
 		setTimeout(() => {
@@ -213,7 +212,7 @@ const AddBulkUsersPage = () => {
 						type="info"
 						showIcon
 						icon={<Info className="w-4 h-4" />}
-						message="Backend will create all users from the uploaded payload. JSON should be an array of objects with name, email, role."
+						title="Backend will create all users from the uploaded payload. JSON should be an array of objects with name, email, role."
 					/>
 				</div>
 				<div className="w-full min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:w-[320px] lg:shrink-0">
@@ -268,7 +267,7 @@ const AddBulkUsersPage = () => {
 							className="mt-3"
 							type="error"
 							showIcon
-							message={info.uploadError}
+							title={info.uploadError}
 						/>
 					)}
 				</div>
