@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import {
 	Input,
 	Select,
@@ -13,6 +14,8 @@ import {
 	Empty,
 } from "antd";
 import { Search, Users, Filter, Trash2 } from "lucide-react";
+import { fetchSchoolTeachers, removeUsersFromSchool } from "@/service/auth";
+import { useParams } from "next/navigation";
 
 const availableClasses = {
 	Nursery: 1,
@@ -50,70 +53,70 @@ const subjectOptions = [
 	"Art",
 ].map((s) => ({ label: s, value: s }));
 
-const seedTeachers = [
-	{
-		id: 1,
-		name: "Anjali Mehra",
-		email: "anjali.mehra@example.com",
-		subjects: ["Mathematics", "Computer Science"],
-		classes: ["CLASS 9", "CLASS 10"],
-	},
-	{
-		id: 2,
-		name: "Rakesh Nair",
-		email: "r.nair@example.com",
-		subjects: ["Physics"],
-		classes: ["CLASS 11", "CLASS 12"],
-	},
-	{
-		id: 3,
-		name: "Priya Kulkarni",
-		email: "priya.k@example.com",
-		subjects: ["English", "History"],
-		classes: ["CLASS 6", "CLASS 7", "CLASS 8"],
-	},
-];
-
 const TeachersPage = () => {
+	const params = useParams();
+	const slug = params?.id;
 	const [info, setInfo] = useState({
-		teachers: seedTeachers,
+		teachers: [],
 		search: "",
 		subjectFilter: [],
 		classFilter: [],
+		page: 1,
+		limit: 10,
+		loading: true,
+		total: 0,
 	});
 
-	const handleRemove = (id) => {
-		setInfo((prev) => ({
-			...prev,
-			teachers: prev.teachers.filter((t) => t.id !== id),
-		}));
-		message.success("Teacher removed");
-	};
-
-	const filtered = useMemo(() => {
-		return info.teachers.filter((t) => {
-			const q = info.search.trim().toLowerCase();
-			const matchesSearch =
-				!q ||
-				t.name.toLowerCase().includes(q) ||
-				t.email.toLowerCase().includes(q);
-
-			const matchesSubject =
-				info.subjectFilter.length === 0 ||
-				info.subjectFilter.some((sub) => t.subjects.includes(sub));
-
-			const matchesClass =
-				info.classFilter.length === 0 ||
-				info.classFilter.some((cls) => t.classes.includes(cls));
-
-			return matchesSearch && matchesSubject && matchesClass;
-		});
+	useEffect(() => {
+		handeFetchTeachers();
 	}, [
-		info.teachers,
-		info.search,
-		info.subjectFilter,
-		info.classFilter,
+		info?.search,
+		info?.subjectFilter,
+		info?.classFilter,
+		info?.subjectFilter,
+		info?.page,
 	]);
+
+	const handeFetchTeachers = useCallback(async () => {
+		try {
+			const { data } = await fetchSchoolTeachers(
+				slug,
+				info?.page,
+				info?.limit,
+				info?.search,
+				JSON.stringify(info?.classFilter),
+				JSON.stringify(info?.subjectFilter)
+			);
+
+			const { teachers = [], total } = data;
+			setInfo((prev) => ({ ...prev, teachers, total }));
+		} catch (error) {
+			console.log("error==>handeFetchTeachers", error);
+			message.error("Something went wrong");
+		} finally {
+			setInfo((prev) => ({ ...prev, loading: false }));
+		}
+	}, [
+		slug,
+		info?.page,
+		info?.limit,
+		info?.search,
+		info?.classFilter,
+		info?.subjectFilter,
+	]);
+
+	const handleRemove = async (id) => {
+		try {
+			await removeUsersFromSchool(slug, id);
+			setInfo((prev) => ({
+				...prev,
+				teachers: prev.teachers.filter((t) => t.userId !== id),
+			}));
+			message.success("Teacher removed");
+		} catch (error) {
+			console.log("Something went wrong");
+		}
+	};
 
 	const columns = [
 		{ title: "Name", dataIndex: "name", key: "name" },
@@ -154,7 +157,7 @@ const TeachersPage = () => {
 					title="Remove this teacher?"
 					okText="Remove"
 					cancelText="Cancel"
-					onConfirm={() => handleRemove(record.id)}
+					onConfirm={() => handleRemove(record.userId)}
 				>
 					<Button danger type="text" icon={<Trash2 className="w-4 h-4" />}>
 						Remove
@@ -237,14 +240,17 @@ const TeachersPage = () => {
 					</div>
 					<Divider className="!my-2" />
 					<div className="space-y-3 md:hidden">
-						{filtered.length === 0 ? (
-							<div className="rounded-xl border border-dashed border-slate-200 px-4 py-8">
+						{info?.teachers.length === 0 ? (
+							<div
+								key="emptyState"
+								className="rounded-xl border border-dashed border-slate-200 px-4 py-8"
+							>
 								<Empty description="No teachers found" />
 							</div>
 						) : (
-							filtered.map((teacher) => (
+							info?.teachers?.map((teacher) => (
 								<div
-									key={teacher.id}
+									key={teacher._id}
 									className="rounded-xl border border-slate-200 bg-slate-50 p-4"
 								>
 									<div className="space-y-3">
@@ -301,11 +307,12 @@ const TeachersPage = () => {
 					<div className="hidden md:block overflow-x-auto">
 						<Table
 							columns={columns}
-							dataSource={filtered.map((t) => ({ ...t, key: t.id }))}
-							pagination={{ pageSize: 7, size: "small" }}
+							dataSource={info?.teachers.map((t) => ({ ...t, key: t._id }))}
+							pagination={{ pageSize: info?.total, size: "small" }}
 							tableLayout="auto"
 							scroll={{ x: 820 }}
 							locale={{ emptyText: <Empty description="No teachers found" /> }}
+							loading={info?.loading}
 						/>
 					</div>
 				</div>

@@ -105,3 +105,49 @@ export const createUsersinBulk = async (slug, payload) => {
 		throw error;
 	}
 };
+
+export const fetchSchoolStudents = async (
+	slug,
+	page = 1,
+	limit = 10,
+	query = "",
+	studentClass = ""
+) => {
+	try {
+		const { data } = await api.get(
+			`/auth/${slug}/fetch-all-students?page=${page}&limit=${limit}&query=${query}&studentClass=${studentClass}`
+		);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const fetchSchoolTeachers = async (
+	slug,
+	page = 1,
+	limit = 10,
+	query = "",
+	classFilter = "",
+	subjectsFilter = ""
+) => {
+	try {
+		const { data } = await api.get(
+			`/auth/${slug}/fetch-all-teachers?page=${page}&limit=${limit}&query=${query}&classFilter=${classFilter}&subjectsFilter=${subjectsFilter}`
+		);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const removeUsersFromSchool = async (slug, userId) => {
+	try {
+		const { data } = await api.delete(
+			`/auth/${slug}/remove-user-from-school/${userId}`
+		);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
