@@ -20,6 +20,7 @@ const Sidebar = ({ variant = "desktop", closeDrawer }) => {
 	const router = useRouter();
 	const [info, setInfo] = useState({
 		userName: "",
+		role: "",
 	});
 	const slug = params?.id;
 
@@ -27,14 +28,20 @@ const Sidebar = ({ variant = "desktop", closeDrawer }) => {
 		try {
 			if (typeof window === "undefined") return;
 			let user = localStorage.getItem("user");
+			let memberShip = localStorage.getItem("membership");
+			memberShip = memberShip ? JSON.parse(memberShip) : null;
 			user = user ? JSON.parse(user) : null;
-			setInfo((prev) => ({ ...prev, userName: user?.name }));
+			setInfo((prev) => ({
+				...prev,
+				userName: user?.name,
+				role: memberShip?.role,
+			}));
 		} catch (error) {
 			console.log("error while fetching user name");
 		}
 	}, []);
 
-	const navItems = useMemo(
+	const navItemsForAdmin = useMemo(
 		() => [
 			{
 				title: "Profile",
@@ -54,12 +61,7 @@ const Sidebar = ({ variant = "desktop", closeDrawer }) => {
 				icon: GraduationCap,
 				route: "students",
 			},
-			{
-				title: "Attendance",
-				href: `/${slug}/dashboard/attendance`,
-				icon: CalendarCheck2,
-				route: "attendance",
-			},
+
 			{
 				title: "Teachers",
 				href: `/${slug}/dashboard/teachers`,
@@ -71,6 +73,48 @@ const Sidebar = ({ variant = "desktop", closeDrawer }) => {
 				href: `/${slug}/dashboard/add-bulk-users`,
 				icon: UploadCloud,
 				route: "add-bulk-users",
+			},
+		],
+		[slug]
+	);
+
+	const navItemsForTeachers = useMemo(
+		() => [
+			{
+				title: "Profile",
+				href: `/${slug}/dashboard/profile`,
+				icon: UserRound,
+				route: "profile",
+			},
+			{
+				title: "Announcements",
+				href: `/${slug}/dashboard/announcements`,
+				icon: Megaphone,
+				route: "announcements",
+			},
+			{
+				title: "Attendance",
+				href: `/${slug}/dashboard/attendance`,
+				icon: CalendarCheck2,
+				route: "attendance",
+			},
+		],
+		[slug]
+	);
+
+	const navItemsForUsers = useMemo(
+		() => [
+			{
+				title: "Profile",
+				href: `/${slug}/dashboard/profile`,
+				icon: UserRound,
+				route: "profile",
+			},
+			{
+				title: "Announcements",
+				href: `/${slug}/dashboard/announcements`,
+				icon: Megaphone,
+				route: "announcements",
 			},
 		],
 		[slug]
@@ -90,6 +134,20 @@ const Sidebar = ({ variant = "desktop", closeDrawer }) => {
 		localStorage.clear();
 		router.push(`/${slug}/login`);
 	}, [slug, closeDrawer, router]);
+
+	const navItems = useMemo(() => {
+		if (!info?.role) return [];
+
+		if (info?.role === "admin") {
+			return navItemsForAdmin;
+		}
+		if (info?.role === "teacher") {
+			return navItemsForTeachers;
+		}
+		if (info?.role === "student") {
+			return navItemsForUsers;
+		}
+	}, [info?.role, navItemsForAdmin, navItemsForTeachers, navItemsForUsers]);
 
 	const content = (
 		<div className="flex flex-col h-full">

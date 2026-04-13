@@ -66,7 +66,14 @@ const AnnouncementsPage = () => {
 		activeId: null,
 		modalOpen: false,
 		filterScope: "all",
+		role: "",
 	});
+
+	useEffect(() => {
+		let memberShip = localStorage.getItem("membership");
+		memberShip = memberShip ? JSON.parse(memberShip) : null;
+		setInfo((prev) => ({ ...prev, role: memberShip?.role || "" }));
+	}, []);
 
 	useEffect(() => {
 		fetchAnnouncement();
@@ -88,8 +95,6 @@ const AnnouncementsPage = () => {
 		} catch (error) {
 			message.error("Error fetching announcements");
 		}
-
-		console.log("response", response);
 	}, [slug]);
 
 	const handleSubmit = useCallback(
@@ -244,21 +249,25 @@ const AnnouncementsPage = () => {
 								setInfo((prev) => ({ ...prev, filterScope: val }))
 							}
 						/>
-						<Button
-							type="primary"
-							icon={<Plus className="w-4 h-4" />}
-							className="w-full sm:w-auto"
-							onClick={() => {
-								setInfo((prev) => ({
-									...prev,
-									editingId: null,
-									modalOpen: true,
-								}));
-								form.resetFields();
-							}}
-						>
-							Add announcement
-						</Button>
+						{info?.role && info?.role !== "student" ? (
+							<Button
+								type="primary"
+								icon={<Plus className="w-4 h-4" />}
+								className="w-full sm:w-auto"
+								onClick={() => {
+									setInfo((prev) => ({
+										...prev,
+										editingId: null,
+										modalOpen: true,
+									}));
+									form.resetFields();
+								}}
+							>
+								Add announcement
+							</Button>
+						) : (
+							""
+						)}
 					</div>
 				</div>
 				<div className="flex flex-col divide-y divide-slate-100 md:flex-row md:divide-x md:divide-y-0">
@@ -370,31 +379,35 @@ const AnnouncementsPage = () => {
 											{activeAnnouncement.description}
 										</p>
 
-										<div className="flex flex-col gap-3 pt-2 sm:flex-row">
-											<Button
-												type="default"
-												icon={<Edit3 className="w-4 h-4" />}
-												className="w-full sm:w-auto"
-												onClick={() => handleEdit(activeAnnouncement)}
-											>
-												Edit
-											</Button>
-											<Popconfirm
-												title="Delete this announcement?"
-												okText="Delete"
-												cancelText="Cancel"
-												onConfirm={() => handleDelete(activeAnnouncement._id)}
-											>
+										{info?.role && info?.role !== "student" ? (
+											<div className="flex flex-col gap-3 pt-2 sm:flex-row">
 												<Button
-													type="primary"
-													danger
-													icon={<Trash2 className="w-4 h-4" />}
+													type="default"
+													icon={<Edit3 className="w-4 h-4" />}
 													className="w-full sm:w-auto"
+													onClick={() => handleEdit(activeAnnouncement)}
 												>
-													Delete
+													Edit
 												</Button>
-											</Popconfirm>
-										</div>
+												<Popconfirm
+													title="Delete this announcement?"
+													okText="Delete"
+													cancelText="Cancel"
+													onConfirm={() => handleDelete(activeAnnouncement._id)}
+												>
+													<Button
+														type="primary"
+														danger
+														icon={<Trash2 className="w-4 h-4" />}
+														className="w-full sm:w-auto"
+													>
+														Delete
+													</Button>
+												</Popconfirm>
+											</div>
+										) : (
+											""
+										)}
 									</>
 								)}
 							</div>
