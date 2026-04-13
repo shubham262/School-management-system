@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/preserve-manual-memoization */
 "use client";
+import { authClient } from "@/config/authClient";
 import { login } from "@/service/auth";
 import { message, Spin } from "antd";
 import { MoveLeft } from "lucide-react";
@@ -53,6 +54,13 @@ const Login = () => {
 			setInfo((prev) => ({ ...prev, loading: false }));
 		}
 	}, [slug, info?.email, info?.password, router]);
+
+	const handleGoogleLogin = useCallback(async () => {
+		const data = await authClient.signIn.social({
+			provider: "google",
+			callbackURL: `http://localhost:3000/${slug}/oauth-callback`,
+		});
+	}, [slug]);
 	return (
 		<div className="w-screen  min-h-screen bg-slate-100 flex justify-center items-center p-4 overflow-y-auto">
 			<div className="w-full max-w-md rounded-2xl overflow-hidden bg-white shadow-md">
@@ -74,7 +82,10 @@ const Login = () => {
 						Back
 					</Link>
 					<h1 className="mt-4 font-semibold text-2xl text-slate-900">Login</h1>
-					<button className="w-full cursor-pointer border border-slate-300 rounded-lg px-4 py-2.5 text-sm text-slate-700 font-bold flex item-center gap-3 justify-center hover:bg-slate-50 mt-5">
+					<button
+						onClick={handleGoogleLogin}
+						className="w-full cursor-pointer border border-slate-300 rounded-lg px-4 py-2.5 text-sm text-slate-700 font-bold flex item-center gap-3 justify-center hover:bg-slate-50 mt-5"
+					>
 						<span className="mt-[3px]">
 							<FcGoogle />
 						</span>
@@ -116,3 +127,5 @@ const Login = () => {
 };
 
 export default memo(Login);
+
+

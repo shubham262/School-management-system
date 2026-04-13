@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import api from "./index";
 
 export const register = async (payload) => {
@@ -155,6 +156,33 @@ export const removeUsersFromSchool = async (slug, userId) => {
 export const updatePassword = async (slug, payload) => {
 	try {
 		const { data } = await api.put(`/auth/${slug}/change-password`, payload);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const getUserInformation = async (slug) => {
+	try {
+		const { data } = await api.get(`/auth/${slug}/fetchUserInformation`);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const fetchUser = async () => {
+	try {
+		const { data } = await api.get(`/auth/fetchUser`);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const createNewSchool = async () => {
+	try {
+		const { data } = await api.post("/auth/register-fresh");
 		return data;
 	} catch (error) {
 		throw error;
