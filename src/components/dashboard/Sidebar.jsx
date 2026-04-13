@@ -10,6 +10,7 @@ import {
 	Users,
 	UploadCloud,
 	LogOut,
+	CalendarCheck2,
 } from "lucide-react";
 import { authClient } from "@/config/authClient";
 
@@ -52,6 +53,12 @@ const Sidebar = ({ variant = "desktop", closeDrawer }) => {
 				href: `/${slug}/dashboard/students`,
 				icon: GraduationCap,
 				route: "students",
+			},
+			{
+				title: "Attendance",
+				href: `/${slug}/dashboard/attendance`,
+				icon: CalendarCheck2,
+				route: "attendance",
 			},
 			{
 				title: "Teachers",
