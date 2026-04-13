@@ -54,123 +54,21 @@ const classOptions = availableClasses.map((className) => ({
 	value: className,
 }));
 
-const demoStudentsByClass = {
-	"CLASS 8": [
-		{ id: "stu-801", name: "Aarav Sharma", rollNo: "08-01" },
-		{ id: "stu-802", name: "Diya Patel", rollNo: "08-02" },
-		{ id: "stu-803", name: "Kabir Singh", rollNo: "08-03" },
-		{ id: "stu-804", name: "Meera Das", rollNo: "08-04" },
-		{ id: "stu-805", name: "Vivaan Nair", rollNo: "08-05" },
-	],
-	"CLASS 9": [
-		{ id: "stu-901", name: "Anaya Gupta", rollNo: "09-01" },
-		{ id: "stu-902", name: "Advik Rao", rollNo: "09-02" },
-		{ id: "stu-903", name: "Ishita Jain", rollNo: "09-03" },
-		{ id: "stu-904", name: "Reyansh Roy", rollNo: "09-04" },
-	],
-	"CLASS 10": [
-		{ id: "stu-1001", name: "Myra Khan", rollNo: "10-01" },
-		{ id: "stu-1002", name: "Arjun Verma", rollNo: "10-02" },
-		{ id: "stu-1003", name: "Sara Thomas", rollNo: "10-03" },
-		{ id: "stu-1004", name: "Yuvan Iyer", rollNo: "10-04" },
-		{ id: "stu-1005", name: "Rhea Bose", rollNo: "10-05" },
-	],
-	"CLASS 11": [
-		{ id: "stu-1101", name: "Krish Malhotra", rollNo: "11-01" },
-		{ id: "stu-1102", name: "Tara Kulkarni", rollNo: "11-02" },
-		{ id: "stu-1103", name: "Zoya Mir", rollNo: "11-03" },
-	],
-	"CLASS 12": [
-		{ id: "stu-1201", name: "Aisha Menon", rollNo: "12-01" },
-		{ id: "stu-1202", name: "Dev Batra", rollNo: "12-02" },
-		{ id: "stu-1203", name: "Parth Sethi", rollNo: "12-03" },
-		{ id: "stu-1204", name: "Siya Chawla", rollNo: "12-04" },
-	],
-};
-
-const fallbackStudents = [
-	{ id: "stu-fallback-1", name: "Class Monitor", rollNo: "00-01" },
-	{ id: "stu-fallback-2", name: "Section Representative", rollNo: "00-02" },
-];
-
-const buildDefaultSession = (students) =>
-	students.reduce((acc, student) => {
-		acc[student.id] = hiddenDefaultStatus;
-		return acc;
-	}, {});
-
 const AttendancePage = () => {
 	const params = useParams();
 	const slug = params?.id;
-	const [messageApi, contextHolder] = message.useMessage();
 
-	const [info, setInfo] = useState(() => {
-		const currentMoment = dayjs().second(0).millisecond(0);
-		let storedRegister = {};
+	const [info, setInfo] = useState({
+		search: "",
+		selectedClass: "CLASS 10",
+		selectedDate: dayjs().second(0).millisecond(0),
 
-		if (typeof window !== "undefined") {
-			try {
-				const rawRegister = localStorage.getItem(
-					`attendance-register-${params?.id || "school"}`
-				);
-				storedRegister = rawRegister ? JSON.parse(rawRegister) : {};
-			} catch (error) {
-				console.log("error while restoring attendance register", error);
-			}
-		}
-
-		return {
-			search: "",
-			selectedClass: "CLASS 10",
-			selectedDate: currentMoment,
-			register: storedRegister,
-		};
+		students: [],
 	});
 
-	const storageKey = useMemo(
-		() => `attendance-register-${slug || "school"}`,
-		[slug]
-	);
-
-	const students = useMemo(
-		() =>
-			demoStudentsByClass[info.selectedClass] ||
-			fallbackStudents.map((student, index) => ({
-				...student,
-				id: `${info.selectedClass}-${index + 1}`,
-			})),
-		[info.selectedClass]
-	);
-
-	const sessionKey = useMemo(
-		() => `${info.selectedClass}-${info.selectedDate.format("YYYY-MM-DD")}`,
-		[info.selectedClass, info.selectedDate]
-	);
-
-	useEffect(() => {
-		if (typeof window === "undefined") return;
-
-		try {
-			localStorage.setItem(storageKey, JSON.stringify(info.register));
-		} catch (error) {
-			console.log("error while saving attendance register", error);
-		}
-	}, [info.register, storageKey]);
-
-	const currentSessionRegister = useMemo(
-		() => info.register[sessionKey] || buildDefaultSession(students),
-		[info.register, sessionKey, students]
-	);
-
-	const filteredStudents = useMemo(() => {
-		const normalizedQuery = info.search.trim().toLowerCase();
-
-		return students.filter((student) => {
-			if (!normalizedQuery) return true;
-			return student.name.toLowerCase().includes(normalizedQuery);
-		});
-	}, [info.search, students]);
-
+	const updateStudentStatus = useCallback((studentId, nextStatus) => {}, []);
+	const handleBulkStatus = useCallback((status) => {}, []);
+	const handleSaveSession = useCallback(() => {}, []);
 	const attendanceSummary = useMemo(() => {
 		const counts = {
 			present: 0,
@@ -178,63 +76,8 @@ const AttendancePage = () => {
 			absent: 0,
 			notMarked: 0,
 		};
-
-		students.forEach((student) => {
-			const status = currentSessionRegister[student.id] || hiddenDefaultStatus;
-			if (status === hiddenDefaultStatus) {
-				counts.notMarked += 1;
-				return;
-			}
-			counts[status] += 1;
-		});
-
-		return {
-			...counts,
-			total: students.length,
-		};
-	}, [currentSessionRegister, students]);
-
-	const updateStudentStatus = useCallback(
-		(studentId, nextStatus) => {
-			setInfo((prev) => ({
-				...prev,
-				register: {
-					...prev.register,
-					[sessionKey]: {
-						...(prev.register[sessionKey] || buildDefaultSession(students)),
-						[studentId]: nextStatus,
-					},
-				},
-			}));
-		},
-		[sessionKey, students]
-	);
-
-	const handleBulkStatus = useCallback(
-		(nextStatus) => {
-			const nextSession = students.reduce((acc, student) => {
-				acc[student.id] = nextStatus;
-				return acc;
-			}, {});
-
-			setInfo((prev) => ({
-				...prev,
-				register: {
-					...prev.register,
-					[sessionKey]: nextSession,
-				},
-			}));
-		},
-		[sessionKey, students]
-	);
-
-	const handleSaveSession = useCallback(() => {
-		messageApi.success(
-			`Attendance saved for ${info.selectedClass} on ${info.selectedDate.format(
-				"DD MMM YYYY"
-			)}`
-		);
-	}, [info.selectedClass, info.selectedDate, messageApi]);
+		return counts;
+	}, []);
 
 	const columns = [
 		{
@@ -256,8 +99,7 @@ const AttendancePage = () => {
 			key: "status",
 			width: 390,
 			render: (_, student) => {
-				const activeStatus =
-					currentSessionRegister[student.id] || hiddenDefaultStatus;
+				const activeStatus = hiddenDefaultStatus;
 
 				return (
 					<div className="flex flex-wrap gap-2">
@@ -283,7 +125,6 @@ const AttendancePage = () => {
 
 	return (
 		<div className="max-w-6xl mx-auto space-y-6">
-			{contextHolder}
 			<div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
 				<div className="flex flex-col gap-4 border-b border-slate-100 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6 md:py-5">
 					<div className="flex items-center gap-2 text-slate-900">
@@ -292,7 +133,7 @@ const AttendancePage = () => {
 					</div>
 					<div className="flex flex-wrap items-center gap-2">
 						<Tag color="blue" className="px-2 py-1">
-							{attendanceSummary.total} students
+							{info?.students?.length || 0} students
 						</Tag>
 						<Button onClick={() => handleBulkStatus("present")}>
 							Mark all present
@@ -334,7 +175,8 @@ const AttendancePage = () => {
 									className="w-full"
 									value={info.selectedDate}
 									disabledDate={(current) =>
-										current && current.endOf("day").isAfter(dayjs().endOf("day"))
+										current &&
+										current.endOf("day").isAfter(dayjs().endOf("day"))
 									}
 									onChange={(value) =>
 										value &&
@@ -380,17 +222,16 @@ const AttendancePage = () => {
 					</div>
 
 					<div className="space-y-3 md:hidden">
-						{filteredStudents.length === 0 ? (
+						{info?.students.length === 0 ? (
 							<div className="rounded-xl border border-dashed border-slate-200 px-4 py-8">
 								<Empty description="No students matched this search" />
 							</div>
 						) : (
-							filteredStudents.map((student) => {
-								const activeStatus =
-									currentSessionRegister[student.id] || hiddenDefaultStatus;
+							info?.students.map((student) => {
+								const activeStatus = hiddenDefaultStatus;
 								return (
 									<div
-										key={student.id}
+										key={student._id}
 										className="rounded-xl border border-slate-200 bg-slate-50 p-4"
 									>
 										<div className="flex items-start justify-between gap-3">
@@ -445,9 +286,9 @@ const AttendancePage = () => {
 					<div className="hidden overflow-x-auto md:block">
 						<Table
 							columns={columns}
-							dataSource={filteredStudents.map((student) => ({
+							dataSource={info?.students?.map((student) => ({
 								...student,
-								key: student.id,
+								key: student._id,
 							}))}
 							pagination={false}
 							scroll={{ x: 900 }}
