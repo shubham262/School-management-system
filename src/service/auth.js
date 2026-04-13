@@ -160,3 +160,12 @@ export const updatePassword = async (slug, payload) => {
 		throw error;
 	}
 };
+
+export const getUserInformation = async (slug) => {
+	try {
+		const { data } = await api.get(`/auth/${slug}/getUserInformation`);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
