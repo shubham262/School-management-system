@@ -118,8 +118,7 @@ const AttendancePage = () => {
 				students: info?.students || [],
 				date: info?.selectedDate?.format("YYYY-MM-DD"),
 			};
-			const response = await saveAttendence(slug, payload);
-			console.log("response", response);
+			await saveAttendence(slug, payload);
 		} catch (error) {
 			console.log("error", error);
 			message.error("Something went wrong while saving");
@@ -301,7 +300,8 @@ const AttendancePage = () => {
 							</div>
 						) : (
 							info?.students.map((student) => {
-								const activeStatus = hiddenDefaultStatus;
+								const activeStatus =
+									student?.attendenceStatus || hiddenDefaultStatus;
 								return (
 									<div
 										key={student._id}
@@ -343,7 +343,7 @@ const AttendancePage = () => {
 															: "default"
 													}
 													onClick={() =>
-														updateStudentStatus(student.id, status.value)
+														updateStudentStatus(student.userId, status.value)
 													}
 												>
 													{status.label}
