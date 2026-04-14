@@ -62,7 +62,6 @@ const AttendancePage = () => {
 		search: "",
 		selectedClass: "CLASS 10",
 		selectedDate: dayjs().second(0).millisecond(0),
-
 		students: [],
 	});
 
