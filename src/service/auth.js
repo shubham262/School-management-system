@@ -188,3 +188,30 @@ export const createNewSchool = async () => {
 		throw error;
 	}
 };
+
+export const fetchStudentsAttendence = async (
+	slug,
+	date = "",
+	studentClass = ""
+) => {
+	try {
+		const { data } = await api.get(
+			`/auth/${slug}/fetch-students-attendence?date=${date}&studentClass=${studentClass}`
+		);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const saveAttendence = async (slug, payload) => {
+	try {
+		const { data } = await api.post(
+			`/auth/${slug}/save-students-attendence`,
+			payload
+		);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};

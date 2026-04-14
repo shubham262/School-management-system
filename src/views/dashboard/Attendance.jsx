@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/immutability */
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -22,6 +24,7 @@ import {
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import dayjs from "dayjs";
+import { fetchStudentsAttendence, saveAttendence } from "@/service/auth";
 
 const attendanceStatuses = [
 	{ label: "Present", value: "present", color: "green" },
@@ -63,11 +66,65 @@ const AttendancePage = () => {
 		selectedClass: "CLASS 10",
 		selectedDate: dayjs().second(0).millisecond(0),
 		students: [],
+		loading: true,
 	});
 
-	const updateStudentStatus = useCallback((studentId, nextStatus) => {}, []);
-	const handleBulkStatus = useCallback((status) => {}, []);
-	const handleSaveSession = useCallback(() => {}, []);
+	useEffect(() => {
+		fetchData();
+	}, [info?.selectedDate, info?.selectedClass]);
+	const fetchData = useCallback(async () => {
+		try {
+			setInfo((prev) => ({ ...prev, loading: true }));
+			const { results = [] } = await fetchStudentsAttendence(
+				slug,
+				info?.selectedDate.format("YYYY-MM-DD"),
+				info?.selectedClass
+			);
+			setInfo((prev) => ({ ...prev, students: results }));
+		} catch (error) {
+			console.log("error", error);
+			message.error("Something went wrong");
+		} finally {
+			setInfo((prev) => ({ ...prev, loading: false }));
+		}
+	}, [slug, info?.selectedDate, info?.selectedClass]);
+
+	const updateStudentStatus = useCallback(
+		(userId, nextStatus) => {
+			let students = info?.students || [];
+			students = students?.map((ele) => ({
+				...ele,
+				attendenceStatus:
+					ele?.userId === userId ? nextStatus : ele?.attendenceStatus,
+			}));
+			setInfo((prev) => ({ ...prev, students }));
+		},
+		[info?.students]
+	);
+	const handleBulkStatus = useCallback(
+		(status) => {
+			let students = info?.students || [];
+			students = students?.map((ele) => ({
+				...ele,
+				attendenceStatus: status,
+			}));
+			setInfo((prev) => ({ ...prev, students }));
+		},
+		[info?.students]
+	);
+	const handleSaveSession = useCallback(async () => {
+		try {
+			const payload = {
+				students: info?.students || [],
+				date: info?.selectedDate?.format("YYYY-MM-DD"),
+			};
+			const response = await saveAttendence(slug, payload);
+			console.log("response", response);
+		} catch (error) {
+			console.log("error", error);
+			message.error("Something went wrong while saving");
+		}
+	}, [info?.students, info?.selectedDate, slug]);
 	const attendanceSummary = useMemo(() => {
 		const counts = {
 			present: 0,
@@ -75,8 +132,23 @@ const AttendancePage = () => {
 			absent: 0,
 			notMarked: 0,
 		};
+
+		info?.students.forEach((ele) => {
+			if (ele?.attendenceStatus === "present") {
+				counts.present++;
+			}
+			if (ele?.attendenceStatus === "absent") {
+				counts.absent++;
+			}
+			if (ele?.attendenceStatus === "late") {
+				counts.late++;
+			}
+			if (ele?.attendenceStatus === "not-marked") {
+				counts.notMarked++;
+			}
+		});
 		return counts;
-	}, []);
+	}, [info?.students]);
 
 	const columns = [
 		{
@@ -98,7 +170,7 @@ const AttendancePage = () => {
 			key: "status",
 			width: 390,
 			render: (_, student) => {
-				const activeStatus = hiddenDefaultStatus;
+				const activeStatus = student?.attendenceStatus || hiddenDefaultStatus;
 
 				return (
 					<div className="flex flex-wrap gap-2">
@@ -110,7 +182,9 @@ const AttendancePage = () => {
 									type={active ? "primary" : "default"}
 									color={active ? status.color : "default"}
 									variant={active ? "solid" : "outlined"}
-									onClick={() => updateStudentStatus(student.id, status.value)}
+									onClick={() =>
+										updateStudentStatus(student.userId, status.value)
+									}
 								>
 									{status.label}
 								</Button>
@@ -296,6 +370,7 @@ const AttendancePage = () => {
 									<Empty description="No students matched this search" />
 								),
 							}}
+							loading={info?.loading}
 						/>
 					</div>
 				</div>
