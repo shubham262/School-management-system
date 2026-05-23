@@ -144,8 +144,9 @@ const SchoolInformation = () => {
 		};
 
 		try {
-			const response = await updateSchoolInformation(slug, payload);
-			const { slug: updatedSlug } = response || {};
+			const { data } = await updateSchoolInformation(slug, payload);
+
+			const { slug: updatedSlug } = data || {};
 			message.success("School information updated successfully");
 			router.push(`/${updatedSlug}`);
 		} catch (error) {
